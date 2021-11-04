@@ -202,12 +202,18 @@ def iso14443a4aReadBinary(cla_bytes, address_start_int, length_int, RF_PACKAGE_S
     if retry_cnt_int==9:
       return b''
 
+def cosAnalysis(data_size,show_picture_str):
+  rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
+  res,s1,s2 = sendCommand(rf_command_bytes)
+  iso14443a4aReadBinary(0xA2,0,80,10)
+  # data_bytes = Des3_Cipher.decrypt(data_bytes)
+
 
 
 Des3_Cipher = cosAccess('0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
 temp_num = cosReadTempture(Des3_Cipher)
 # cosReadData(Des3_Cipher,0X00,0XFA,0x10)
-# cosReadData(Des3_Cipher,0,622,256)
+cosAnalysis(500,'')
 
 
 
@@ -325,8 +331,6 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_str):
     plt.ylabel('adc value')
     plt.xlabel('time')
     plt.show()
-
-COS_Analysis(Des3_Cipher,temp_num,'')
 
 
 def ISO14443_4A_ReadBinary(sscom, cla_bytes, address_start_int, length_int, RF_PACKAGE_SIZE):
