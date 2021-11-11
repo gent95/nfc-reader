@@ -3,7 +3,6 @@
 """
 Smart Card Reader / Writer
 """
-
 from smartcard.CardType import AnyCardType
 from smartcard.CardRequest import CardRequest
 from smartcard.util import toHexString
@@ -293,7 +292,7 @@ def ISO14443_4A_UpdateBinary(cla_bytes, address_start_int, length_int, data_writ
 
 
 # 数据解析
-def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_str):
+def COS_Analysis_old(Des3_Cipher, DATA_SIZE, show_picture_str):
   item_print("COS数据解析")
   # 选中DATA
   rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
@@ -432,29 +431,18 @@ def COS_Write_Config(Des3_Cipher, address_int, length_int, write_bytes, package_
   return result
 
 
-card_service = init()
-Des3_Cipher = COS_Access('0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
-# temp_num = cosReadTempture(Des3_Cipher)
-# COS_Analysis(Des3_Cipher,60,False)
-# COS_Read_Config(Des3_Cipher,49162,8,16)
-# COS_Write_Config(Des3_Cipher,)
-COS_Read_Tempture(Des3_Cipher)
-
-
-
 # 数据解析
-def COS_Analysis(SeialCom, Des3_Cipher, DATA_SIZE, show_picture_str):
+def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
   TEMPTURE_SHOW = True                                                                                    # 显示温度
   # TEMPTURE_CAL_TYPE = "KB"                                                                              # KB校准
   TEMPTURE_CAL_TYPE = "3POS"                                                                              # 三点校准
   item_print("COS数据解析")
   # 选中DATA
-  rf_command_bytes = iso14443a_add_crc16(b'\x02\xA2\xA4\x00\x0C\x02\xDA\x01')
-  command_bytes = build_com_command(rf_command_bytes, True)
-  command_bytes = command_add_package_length(command_bytes)
-  data_bytes, length = sscom_transceive_bytes(SeialCom, command_bytes)
+  rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
+  data_bytes, s1,s2 = sendCommand(rf_command_bytes)
   # 读取数据
-  data_bytes = ISO14443_4A_ReadBinary(SeialCom, b'\xA2', 0, 80, DATA_SIZE)
+  data_bytes = ISO14443_4A_ReadBinary(0xA2, 0, 80, DATA_SIZE)
+  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   # 解析数据
   data_bias = 12
@@ -504,6 +492,7 @@ def COS_Analysis(SeialCom, Des3_Cipher, DATA_SIZE, show_picture_str):
                 "CAL2: " + str(Cal_Data[1][0])  + " " + str(Cal_Data[1][1]) + "\n" + \
                 "CAL3: " + str(Cal_Data[2][0])  + " " + str(Cal_Data[2][1])
   result_print(info_str, True)
+  RNUM_bytes = [0x00,0x00,0x00,0x11]
   record_number_int = bytes2int(RNUM_bytes)
   record_data_size_int = int(record_number_int*11/8)
   if(record_number_int*11%8):
@@ -517,7 +506,8 @@ def COS_Analysis(SeialCom, Des3_Cipher, DATA_SIZE, show_picture_str):
   if (start_address_int+record_data_size_int)>NDEF_MAX_INT:
     record_data_size_int = record_data_size_int - 8
     record_number_int = int(record_data_size_int*8/11)
-  data_bytes = ISO14443_4A_ReadBinary(SeialCom, b'\xA2', 78, record_data_size_int, DATA_SIZE)
+  data_bytes = ISO14443_4A_ReadBinary(0xA2, 78, record_data_size_int, DATA_SIZE)
+  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   # 解析adc
   tempture_data = [0 for i in range(record_number_int)]
@@ -576,7 +566,7 @@ def COS_Analysis(SeialCom, Des3_Cipher, DATA_SIZE, show_picture_str):
         tempture_data[decode_count-1] = adc_data_int
   result_print(str(tempture_data), True)
   # 波形显示
-  if show_picture_str == "show picture":
+  if show_picture_tag:
     DATA_FILTER = 0
     x = [0 for i in range(record_number_int)]
     for i in range(0, record_number_int):
@@ -590,3 +580,11 @@ def COS_Analysis(SeialCom, Des3_Cipher, DATA_SIZE, show_picture_str):
     plt.ylabel('adc value')
     plt.xlabel('time')
     plt.show()
+
+card_service = init()
+Des3_Cipher = COS_Access('0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
+# temp_num = cosReadTempture(Des3_Cipher)
+COS_Analysis(Des3_Cipher,60,False)
+# COS_Read_Config(Des3_Cipher,49162,8,16)
+# COS_Write_Config(Des3_Cipher,)
+# COS_Read_Tempture(Des3_Cipher)
