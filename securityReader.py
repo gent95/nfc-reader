@@ -135,7 +135,11 @@ def sendCommand(command):
 def COS_Access(KEYA_str, KEYB_str):
     print('开始ACCESS验证')
     rf_command_bytes = [ 0xA2, 0xA4, 0x00, 0x0C, 0x02, 0xAC, 0x01]
-    sendCommand(rf_command_bytes)
+    data_byres,s1,s2 = sendCommand(rf_command_bytes)
+    if s1=='63' and s2 == 'c0':
+      tm.sleep(15)
+      rf_command_bytes = [ 0xA2, 0xA4, 0x00, 0x0C, 0x02, 0xAC, 0x01]
+      data_byres,s1,s2 = sendCommand(rf_command_bytes)
     rf_command_bytes = [0xA2, 0xB0, 0x00, 0x10, 0x10]
     data_bytes,s1,s2 = sendCommand(rf_command_bytes)
     trnd_bytes = data_bytes[0:8]
@@ -492,7 +496,7 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
                 "CAL2: " + str(Cal_Data[1][0])  + " " + str(Cal_Data[1][1]) + "\n" + \
                 "CAL3: " + str(Cal_Data[2][0])  + " " + str(Cal_Data[2][1])
   result_print(info_str, True)
-  RNUM_bytes = [0x00,0x00,0x00,0x11]
+  RNUM_bytes = [0x00,0x00,0x0b,0x3a]
   record_number_int = bytes2int(RNUM_bytes)
   record_data_size_int = int(record_number_int*11/8)
   if(record_number_int*11%8):
@@ -583,8 +587,7 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
 
 card_service = init()
 Des3_Cipher = COS_Access('0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
-# temp_num = cosReadTempture(Des3_Cipher)
 COS_Analysis(Des3_Cipher,60,False)
-# COS_Read_Config(Des3_Cipher,49162,8,16)
-# COS_Write_Config(Des3_Cipher,)
+# COS_Write_Config(Des3_Cipher,49162,8,[0xF8, 0x03, 0x00, 0x0F, 0x20, 0x00, 0xF6, 0x00],8)
+# COS_Read_Config(Des3_Cipher,49162,8,8)
 # COS_Read_Tempture(Des3_Cipher)
