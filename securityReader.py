@@ -496,7 +496,7 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
                 "CAL2: " + str(Cal_Data[1][0])  + " " + str(Cal_Data[1][1]) + "\n" + \
                 "CAL3: " + str(Cal_Data[2][0])  + " " + str(Cal_Data[2][1])
   result_print(info_str, True)
-  RNUM_bytes = [0x00,0x00,0x0b,0x3a]
+  # RNUM_bytes = [0x00,0x00,0x0b,0x3a]
   record_number_int = bytes2int(RNUM_bytes)
   record_data_size_int = int(record_number_int*11/8)
   if(record_number_int*11%8):
@@ -557,7 +557,7 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
           adc1 = Cal_Data[0][1]
           tempture2 = Cal_Data[1][0]
           adc2 = Cal_Data[1][1]
-        else:                         # 
+        else:                         
           tempture1 = Cal_Data[1][0]
           adc1 = Cal_Data[1][1]
           tempture2 = Cal_Data[2][0]
