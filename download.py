@@ -31,7 +31,7 @@ def request_download(chipNum):
 	#邦德威pdf
 	# pdf_url = 'http://121.229.41.37:8091/file/pdf/'+str(chipNum)+'_.pdf'
 	#evvm 厂家pdf
-	pdf_url = 'http://evvmapi.vandh.org/file/pdf/'+str(chipNum)+'.pdf'
+	pdf_url = 'http://evvmapi.vandh.org/file/pdf/'+str(chipNum)+'_.pdf'
 	r = requests.get(pdf_url)
 	with open('./image/'+chipNum+'.pdf', 'wb') as f:
 		f.write(r.content)  
@@ -107,13 +107,13 @@ def exportES2excel():
 
 # exportES2excel()
 
-es = elasticsearch_connection_init()
-data = elasticsearch_export(es,'0a5ac4c6-19b5-416e-ab11-9027655a3632')
-conn,cur = mysqlConnectionInit('125.124.123.66',3309,'root','A123456','zy-kgzs')
-for data in data[:]:
-	sql = 'INSERT INTO vvm_temp_2222222 (temp, create_time) VALUES (%s,%s)'
-	param =(data[1],data[2])
-	print(str(data[2]))
-	data = cur.execute(sql,param) # 执行SQL语句
+# es = elasticsearch_connection_init()
+# data = elasticsearch_export(es,'0a5ac4c6-19b5-416e-ab11-9027655a3632')
+# conn,cur = mysqlConnectionInit('125.124.123.66',3309,'root','A123456','zy-kgzs')
+# for data in data[:]:
+# 	sql = 'INSERT INTO vvm_temp_2222222 (temp, create_time) VALUES (%s,%s)'
+# 	param =(data[1],data[2])
+# 	print(str(data[2]))
+# 	data = cur.execute(sql,param) # 执行SQL语句
 	
-conn.commit()
+# conn.commit()

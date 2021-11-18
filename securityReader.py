@@ -12,7 +12,13 @@ import random as rnd
 import time as tm
 import matplotlib.pyplot as plt
 import math
+import logging
 
+# 通过下面的方式进行简单配置输出方式与日志级别
+logging.basicConfig(filename='logger.log', level=logging.INFO)
+
+
+# 初始化读卡器
 def init():
   print('初始化读卡器')
   card_type = AnyCardType()
@@ -22,9 +28,8 @@ def init():
   atr = ATR(card_service.connection.getATR())
   return card_service
 
-# 结果打印（正确：绿色  不正确：红色）
 def result_print(result_out_str, result):
-  print(result_out_str)
+  logger.info(result_out_str)
 
 def trace_command(apdu):
     print('sending ', toHexString(apdu))
@@ -125,23 +130,25 @@ def command_add_package_length(data_bytes):
   return data_bytes
 
 #发送指令 
-def sendCommand(command):
+def sendCommand(card_service,command):
     trace_command(command)
     res, s1, s2 = card_service.connection.transmit(command)
     trace_response(res, s1, s2)
     return res,s1,s2
 
-
-def COS_Access(KEYA_str, KEYB_str):
+# 权限验证
+def COS_Access(card_service,KEYA_str, KEYB_str):
     print('开始ACCESS验证')
     rf_command_bytes = [ 0xA2, 0xA4, 0x00, 0x0C, 0x02, 0xAC, 0x01]
-    data_byres,s1,s2 = sendCommand(rf_command_bytes)
-    if s1=='63' and s2 == 'c0':
+    data_byres,s1,s2 = sendCommand(card_service,rf_command_bytes)
+
+    if s1==99 and s2 == 192:
+      print('解锁标签')  
       tm.sleep(15)
       rf_command_bytes = [ 0xA2, 0xA4, 0x00, 0x0C, 0x02, 0xAC, 0x01]
-      data_byres,s1,s2 = sendCommand(rf_command_bytes)
+      data_byres,s1,s2 = sendCommand(card_service,rf_command_bytes)
     rf_command_bytes = [0xA2, 0xB0, 0x00, 0x10, 0x10]
-    data_bytes,s1,s2 = sendCommand(rf_command_bytes)
+    data_bytes,s1,s2 = sendCommand(card_service,rf_command_bytes)
     trnd_bytes = data_bytes[0:8]
     mid_bytes = data_bytes[8:17]
 
@@ -165,17 +172,17 @@ def COS_Access(KEYA_str, KEYB_str):
     command_bytes.extend(trnd_encrpyt_bytes)
     command_bytes.extend(trnd_bytes)
 
-    res,s1,s2 = sendCommand(command_bytes)
+    res,s1,s2 = sendCommand(card_service,command_bytes)
 
     if s1 == 144 and s2 == 0:
-      res,s1,s2 = sendCommand([0xA2,0xB0,0x00,0x10,0x10])
+      res,s1,s2 = sendCommand(card_service,[0xA2,0xB0,0x00,0x10,0x10])
       # sendCommand(res)
       # trnd_encrpyt_bytes = Des3_Cipher.encrypt(trnd_bytes)
 
     return Des3_Cipher
 
 # 读读取数据
-def COS_Read_Data(Des3_Cipher, address_int, length_int, package_size):
+def COS_Read_Data(card_service,Des3_Cipher, address_int, length_int, package_size):
   item_print("COS读取数据")
   result = False
   # 选中PL DATA
@@ -191,40 +198,85 @@ def COS_Read_Data(Des3_Cipher, address_int, length_int, package_size):
   result_print(data_str, result)
   return result, data_bytes
 
-def cosReadTempture(Des3_Cipher):
-  command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
-  res,s1,s2 = sendCommand(command_bytes)
-  command_bytes = [0xA2,0xB0,0x00,0x4E,0x08]
-  data_bytes,s1,s2 = sendCommand(command_bytes)
-  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
-  data_bytes = Des3_Cipher.decrypt(data_bytes)
-  tempture_int = int(str(data_bytes[0]))*256 + int(str(data_bytes[1]))
-  tempture_int = tempture_int >> 5
-  print(tempture_int)
-
 # 读取温度
-def COS_Read_Tempture(Des3_Cipher):
+def COS_Read_Tempture(card_service,Des3_Cipher):
   item_print("COS读取温度")
   result = False
   tempture_int = 0
   # 选中PL DATA
   command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
-  data_bytes,s1,s2 = sendCommand(command_bytes)
-  # 读数据
+  data_bytes,s1,s2 = sendCommand(card_service,command_bytes)
+
+  # 读取数据
+  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, 60)
+  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
+  data_bytes = Des3_Cipher.decrypt(data_bytes)
+  # 解析数据
+  data_bias = 12
+  CID_bytes  = data_bytes[data_bias+0: data_bias+2]
+  TID_bytes  = data_bytes[data_bias+2: data_bias+8]
+  GTIN_bytes = data_bytes[data_bias+8: data_bias+18]
+  VID_bytes  = data_bytes[data_bias+18:data_bias+26]
+  MID_bytes  = data_bytes[data_bias+26:data_bias+34]
+  MAC_bytes  = data_bytes[data_bias+34:data_bias+42]
+  TRNG_bytes = data_bytes[data_bias+42:data_bias+50]
+  PAGE_bytes = data_bytes[data_bias+50:data_bias+51]
+  RNUM_bytes = data_bytes[data_bias+51:data_bias+55]
+  Cal_Data = [[0 for i in range(2)] for j in range(3)]
+  Cal_Data[0][0] = (data_bytes[data_bias+55]*16 + (data_bytes[data_bias+56]>>4))/10
+  Cal_Data[0][1] = (data_bytes[data_bias+56]&0x0F)*256 + data_bytes[data_bias+57]
+  Cal_Data[1][0] = (data_bytes[data_bias+58]*16 + (data_bytes[data_bias+59]>>4))/10
+  Cal_Data[1][1] = (data_bytes[data_bias+59]&0x0F)*256 + data_bytes[data_bias+60]
+  Cal_Data[2][0] = (data_bytes[data_bias+61]*16 + (data_bytes[data_bias+62]>>4))/10
+  Cal_Data[2][1] = (data_bytes[data_bias+62]&0x0F)*256 + data_bytes[data_bias+63]
+  info_json = {
+      "CID":bytes2hexstr(CID_bytes),
+      "TID":bytes2hexstr(TID_bytes),
+      "GTIN":bytes2hexstr(GTIN_bytes),
+      "VID":bytes2hexstr(VID_bytes),
+      "MID":bytes2hexstr(MID_bytes),
+      "MAC":bytes2hexstr(MAC_bytes),
+      "TRNG":bytes2hexstr(TRNG_bytes),
+      "PAGE":bytes2hexstr(PAGE_bytes),
+      "RUNM":bytes2hexstr(RNUM_bytes),
+      "CAL1":{
+            "TEMP":str(Cal_Data[0][0]),
+            "ADC":str(Cal_Data[0][1])
+        },
+      "CAL2":{
+            "TEMP":str(Cal_Data[1][0]),
+            "ADC":str(Cal_Data[1][1])
+        },
+      "CAL3":{
+            "TEMP":str(Cal_Data[2][0]),
+            "ADC":str(Cal_Data[2][1])
+        }
+  }
+
   command_bytes = [0xA2,0xB0,0x00,0x4E,0x08]
-  data_bytes,s1,s2 = sendCommand(command_bytes)
+  data_bytes,s1,s2 = sendCommand(card_service,command_bytes)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   tempture_int = int(str(data_bytes[0]))*256 + int(str(data_bytes[1]))
-  tempture_int = tempture_int >> 5
-  result = True
-  result_print("温度ADC = " + str(tempture_int), result)
-  if result == False:
-    result_print("失败", result)
-  return result, tempture_int
+  adc_data_int = tempture_int >> 5
+  if(adc_data_int<Cal_Data[1][1]):
+    tempture1 = Cal_Data[0][0]
+    adc1 = Cal_Data[0][1]
+    tempture2 = Cal_Data[1][0]
+    adc2 = Cal_Data[1][1]
+  else:                         
+    tempture1 = Cal_Data[1][0]
+    adc1 = Cal_Data[1][1]
+    tempture2 = Cal_Data[2][0]
+    adc2 = Cal_Data[2][1]
+  k = (tempture1-tempture2)/(adc1-adc2)
+  b = tempture1 - (k*adc1)
+  tempture_float = k*adc_data_int + b
+  info_json['tempture_data'] = tempture_float
+  return info_json
 
 # 读数据
-def ISO14443_4A_ReadBinary(cla_bytes, address_start_int, length_int, RF_PACKAGE_SIZE):
+def ISO14443_4A_ReadBinary(card_service,cla_bytes, address_start_int, length_int, RF_PACKAGE_SIZE):
   data_read_bytes = []
   des3_key_int_list = [0 for i in range(2)]
   package_size_int = RF_PACKAGE_SIZE
@@ -240,7 +292,7 @@ def ISO14443_4A_ReadBinary(cla_bytes, address_start_int, length_int, RF_PACKAGE_
     rf_command_bytes = [cla_bytes,0xB0]
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_size_int]))
-    data_bytes, s1,s2 = sendCommand(rf_command_bytes)
+    data_bytes, s1,s2 = sendCommand(card_service,rf_command_bytes)
     if s1 == 144 and s2 == 0:
       data_read_bytes.extend(data_bytes)
   # 读取剩余数据
@@ -254,13 +306,13 @@ def ISO14443_4A_ReadBinary(cla_bytes, address_start_int, length_int, RF_PACKAGE_
     rf_command_bytes = [cla_bytes,0xB0]
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_size_int]))
-    data_bytes, s1,s2 = sendCommand(rf_command_bytes)
+    data_bytes, s1,s2 = sendCommand(card_service,rf_command_bytes)
     if s1 == 144 and s2 == 0:
       data_read_bytes.extend(data_bytes)
   return data_read_bytes
 
 # ISO14443-4A更新数据
-def ISO14443_4A_UpdateBinary(cla_bytes, address_start_int, length_int, data_write_bytes, RF_PACKAGE_SIZE):
+def ISO14443_4A_UpdateBinary(card_service,cla_bytes, address_start_int, length_int, data_write_bytes, RF_PACKAGE_SIZE):
   des3_key_int_list = [0 for i in range(2)]
   package_size_int = RF_PACKAGE_SIZE
   package_number_int = int(length_int / package_size_int)
@@ -276,7 +328,7 @@ def ISO14443_4A_UpdateBinary(cla_bytes, address_start_int, length_int, data_writ
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_size_int]))
     rf_command_bytes.extend(data_write_bytes[i*package_size_int : (i+1)*package_size_int])
-    data_bytes,s1,s2 = sendCommand(rf_command_bytes)
+    data_bytes,s1,s2 = sendCommand(card_service,rf_command_bytes)
   # 写剩余数据
   if package_bytes_left_int!=0:
     # tm.sleep(0.01)
@@ -291,125 +343,18 @@ def ISO14443_4A_UpdateBinary(cla_bytes, address_start_int, length_int, data_writ
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_bytes_left_int]))
     rf_command_bytes.extend(data_write_bytes[i*package_size_int:i*package_size_int+package_bytes_left_int])
-    data_bytes, s1,s2 = sendCommand(command_bytes)
+    data_bytes, s1,s2 = sendCommand(card_service,command_bytes)
   return data_bytes
 
-
-# 数据解析
-def COS_Analysis_old(Des3_Cipher, DATA_SIZE, show_picture_str):
-  item_print("COS数据解析")
-  # 选中DATA
-  rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
-  data_bytes,s1,s2 = sendCommand(rf_command_bytes)
-  # 读取数据
-  data_bytes = ISO14443_4A_ReadBinary(0xA2, 0, 80, DATA_SIZE)
-  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
-  data_bytes = Des3_Cipher.decrypt(data_bytes)
-  # 解析数据
-  data_bias = 12
-  CID_bytes  = data_bytes[data_bias+0: data_bias+2]
-  TID_bytes  = data_bytes[data_bias+2: data_bias+8]
-  GTIN_bytes = data_bytes[data_bias+8: data_bias+18]
-  VID_bytes  = data_bytes[data_bias+18:data_bias+26]
-  MID_bytes  = data_bytes[data_bias+26:data_bias+34]
-  MAC_bytes  = data_bytes[data_bias+34:data_bias+42]
-  TRNG_bytes = data_bytes[data_bias+42:data_bias+50]
-  PAGE_bytes = data_bytes[data_bias+50:data_bias+51]
-  RNUM_bytes = data_bytes[data_bias+51:data_bias+55]
-  RES_bytes  = data_bytes[data_bias+55:data_bias+58]
-  K_bytes    = data_bytes[data_bias+58:data_bias+62]
-  B_bytes    = data_bytes[data_bias+62:data_bias+66]
-  info_str =  "CID: "  + bytes2hexstr(CID_bytes)  + "\n" + \
-              "TID: "  + bytes2hexstr(TID_bytes)  + "\n" + \
-              "GTIN: " + bytes2hexstr(GTIN_bytes) + "\n" + \
-              "VID: "  + bytes2hexstr(VID_bytes)  + "\n" + \
-              "MID: "  + bytes2hexstr(MID_bytes)  + "\n" + \
-              "MAC: "  + bytes2hexstr(MAC_bytes)  + "\n" + \
-              "TRNG: " + bytes2hexstr(TRNG_bytes) + "\n" + \
-              "PAGE: " + bytes2hexstr(PAGE_bytes) + "\n" + \
-              "RNUM: " + bytes2hexstr(RNUM_bytes) + "\n" + \
-              "RES: "  + bytes2hexstr(RES_bytes)  + "\n" + \
-              "K: "    + bytes2hexstr(K_bytes)    + "\n" + \
-              "B: "    + bytes2hexstr(B_bytes)
-  result_print(info_str, True)
-  RNUM_bytes = [0x00,0x00,0x00,0x01]
-  record_number_int = bytes2int(RNUM_bytes)
-  record_data_size_int = int(record_number_int*11/8)
-  if(record_number_int*11%8):
-    record_data_size_int += 1
-  record_data_size_mod_int = record_data_size_int%8
-  if(record_data_size_mod_int):
-    record_data_size_int = record_data_size_int + (8-record_data_size_mod_int)
-  # 读取数据
-  data_bytes = ISO14443_4A_ReadBinary(0xA2, 78, record_data_size_int, DATA_SIZE)
-  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
-  data_bytes = Des3_Cipher.decrypt(data_bytes)
-  print('data_bytes: '+ str(data_bytes))
-  # 解析adc
-  tempture_data = [0 for i in range(record_number_int)]
-  repeat_cnt = int(record_number_int/8)
-  count_residue = record_number_int%8
-  if count_residue>0:
-    repeat_cnt += 1
-  decode_count = 0
-  for i in range(0, repeat_cnt):
-    for j in range(0, 8):
-      if decode_count>=record_number_int:
-        break
-      else:
-        decode_count += 1
-      if j==0:
-        adc_data_int = data_bytes[i*11]*256+data_bytes[i*11+1]
-        adc_data_int = (adc_data_int&0x0000FFE0)>>5
-      elif j==1:
-        adc_data_int = data_bytes[i*11+1]*256+data_bytes[i*11+2]
-        adc_data_int = (adc_data_int&0x00001FFC)>>2
-      elif j==2:
-        adc_data_int = data_bytes[i*11+2]*65536+data_bytes[i*11+3]*256+data_bytes[i*11+4]
-        adc_data_int = (adc_data_int&0x0003FF80)>>7
-      elif j==3:
-        adc_data_int = data_bytes[i*11+4]*256+data_bytes[i*11+5]
-        adc_data_int = (adc_data_int&0x00007FF0)>>4
-      elif j==4:
-        adc_data_int = data_bytes[i*11+5]*256+data_bytes[i*11+6]
-        adc_data_int = (adc_data_int&0x00000FFE)>>1
-      elif j==5:
-        adc_data_int = data_bytes[i*11+6]*65536+data_bytes[i*11+7]*256+data_bytes[i*11+8]
-        adc_data_int = (adc_data_int&0x0001FFC0)>>6
-      elif j==6:
-        adc_data_int = data_bytes[i*11+8]*256+data_bytes[i*11+9]
-        adc_data_int = (adc_data_int&0x000003FF8)>>3
-      elif j==7:
-        adc_data_int = data_bytes[i*11+9]*256+data_bytes[i*11+10]
-        adc_data_int = (adc_data_int&0x000007FF)>>0
-      adc_data_int = int(adc_data_int)
-      tempture_data[decode_count-1] = adc_data_int
-  print('tempture_data'+ str(tempture_data))
-  # 波形显示
-  if show_picture_str:
-    DATA_FILTER = 0
-    x = [0 for i in range(record_number_int)]
-    for i in range(0, record_number_int):
-      x[i] = i
-    plt.figure(figsize=(20.48, 10.24))
-    plt.title('Tempture Record')
-    lable_name = bytes2hexstr(VID_bytes)
-    plt.plot(x, tempture_data, label= lable_name)
-    plt.legend() # 显示图例
-    plt.ylim(0, 2048)
-    plt.ylabel('adc value')
-    plt.xlabel('time')
-    plt.show()
-
-
-def COS_Read_Config(Des3_Cipher, address_int, length_int, package_size):
+# 读取配置文件
+def COS_Read_Config(card_service,Des3_Cipher, address_int, length_int, package_size):
   item_print("COS读取配置数据")
   result = False
   # 选中CONFIG
   rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xCF,0x01]
-  data_bytes, s1,s2  = sendCommand(rf_command_bytes)
+  data_bytes, s1,s2  = sendCommand(card_service,rf_command_bytes)
   # 读数据
-  data_bytes = ISO14443_4A_ReadBinary(0xA2, address_int, length_int, package_size)
+  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, address_int, length_int, package_size)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   data_str = bytes2hexstr(data_bytes)
@@ -417,16 +362,16 @@ def COS_Read_Config(Des3_Cipher, address_int, length_int, package_size):
   print('config file :'+ data_str)
   return result, data_bytes
 
-
-def COS_Write_Config(Des3_Cipher, address_int, length_int, write_bytes, package_size):
+# 修改配置文件
+def COS_Write_Config(card_service,Des3_Cipher, address_int, length_int, write_bytes, package_size):
   item_print("COS写入配置数据")
   result = False
   # 选中CONFIG
   rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xCF,0x01]
-  data_bytes, s1, s2 = sendCommand(rf_command_bytes)
+  data_bytes, s1, s2 = sendCommand(card_service,rf_command_bytes)
   write_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), write_bytes))
   data_write_bytes = Des3_Cipher.encrypt(write_bytes)
-  data_bytes = ISO14443_4A_UpdateBinary(0xA2, address_int, length_int, data_write_bytes, package_size)
+  data_bytes = ISO14443_4A_UpdateBinary(card_service,0xA2, address_int, length_int, data_write_bytes, package_size)
   if data_bytes!=b'':
     result = True
     result_print("成功", result)
@@ -436,16 +381,16 @@ def COS_Write_Config(Des3_Cipher, address_int, length_int, write_bytes, package_
 
 
 # 数据解析
-def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
+def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
   TEMPTURE_SHOW = True                                                                                    # 显示温度
   # TEMPTURE_CAL_TYPE = "KB"                                                                              # KB校准
-  TEMPTURE_CAL_TYPE = "3POS"                                                                              # 三点校准
+  TEMPTURE_CAL_TYPE = "3POS"  
   item_print("COS数据解析")
   # 选中DATA
   rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xDA,0x01]
-  data_bytes, s1,s2 = sendCommand(rf_command_bytes)
+  data_bytes, s1,s2 = sendCommand(card_service,rf_command_bytes)
   # 读取数据
-  data_bytes = ISO14443_4A_ReadBinary(0xA2, 0, 80, DATA_SIZE)
+  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, DATA_SIZE)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   # 解析数据
@@ -475,6 +420,21 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
                 "RES: "  + bytes2hexstr(RES_bytes)  + "\n" + \
                 "K: "    + bytes2hexstr(K_bytes)    + "\n" + \
                 "B: "    + bytes2hexstr(B_bytes)
+    info_json = {
+          "CID":bytes2hexstr(CID_bytes),
+          "TID":bytes2hexstr(TID_bytes),
+          "GTIN":bytes2hexstr(GTIN_bytes),
+          "VID":bytes2hexstr(VID_bytes),
+          "MID":bytes2hexstr(MID_bytes),
+          "MAC":bytes2hexstr(MAC_bytes),
+          "TRNG":bytes2hexstr(TRNG_bytes),
+          "PAGE":bytes2hexstr(PAGE_bytes),
+          "RUNM":bytes2hexstr(RNUM_bytes),
+          "RES":bytes2hexstr(RES_bytes),
+          "K":bytes2hexstr(K_bytes),
+          "B":bytes2hexstr(B_bytes)
+      }
+
   else:
     Cal_Data = [[0 for i in range(2)] for j in range(3)]
     Cal_Data[0][0] = (data_bytes[data_bias+55]*16 + (data_bytes[data_bias+56]>>4))/10
@@ -495,6 +455,30 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
                 "CAL1: " + str(Cal_Data[0][0])  + " " + str(Cal_Data[0][1]) + "\n" + \
                 "CAL2: " + str(Cal_Data[1][0])  + " " + str(Cal_Data[1][1]) + "\n" + \
                 "CAL3: " + str(Cal_Data[2][0])  + " " + str(Cal_Data[2][1])
+
+    info_json = {
+        "CID":bytes2hexstr(CID_bytes),
+        "TID":bytes2hexstr(TID_bytes),
+        "GTIN":bytes2hexstr(GTIN_bytes),
+        "VID":bytes2hexstr(VID_bytes),
+        "MID":bytes2hexstr(MID_bytes),
+        "MAC":bytes2hexstr(MAC_bytes),
+        "TRNG":bytes2hexstr(TRNG_bytes),
+        "PAGE":bytes2hexstr(PAGE_bytes),
+        "RUNM":bytes2hexstr(RNUM_bytes),
+        "CAL1":{
+              "TEMP":str(Cal_Data[0][0]),
+              "ADC":str(Cal_Data[0][1])
+          },
+        "CAL2":{
+              "TEMP":str(Cal_Data[1][0]),
+              "ADC":str(Cal_Data[1][1])
+          },
+        "CAL3":{
+              "TEMP":str(Cal_Data[2][0]),
+              "ADC":str(Cal_Data[2][1])
+          }
+    }
   result_print(info_str, True)
   # RNUM_bytes = [0x00,0x00,0x0b,0x3a]
   record_number_int = bytes2int(RNUM_bytes)
@@ -510,7 +494,7 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
   if (start_address_int+record_data_size_int)>NDEF_MAX_INT:
     record_data_size_int = record_data_size_int - 8
     record_number_int = int(record_data_size_int*8/11)
-  data_bytes = ISO14443_4A_ReadBinary(0xA2, 78, record_data_size_int, DATA_SIZE)
+  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 78, record_data_size_int, DATA_SIZE)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   # 解析adc
@@ -569,6 +553,7 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
       else:
         tempture_data[decode_count-1] = adc_data_int
   result_print(str(tempture_data), True)
+  info_json['tempture_data'] = tempture_data
   # 波形显示
   if show_picture_tag:
     DATA_FILTER = 0
@@ -584,10 +569,10 @@ def COS_Analysis(Des3_Cipher, DATA_SIZE, show_picture_tag):
     plt.ylabel('adc value')
     plt.xlabel('time')
     plt.show()
-
-card_service = init()
-Des3_Cipher = COS_Access('0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
-COS_Analysis(Des3_Cipher,60,False)
-# COS_Write_Config(Des3_Cipher,49162,8,[0xF8, 0x03, 0x00, 0x0F, 0x20, 0x00, 0xF6, 0x00],8)
-# COS_Read_Config(Des3_Cipher,49162,8,8)
+  return info_json
+# card_service = init()
+# Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
+# COS_Analysis(Des3_Cipher,60,False)
+# COS_Write_Config(card_service,Des3_Cipher,49162,8,[0xF0, 0x03, 0x00, 0x0F, 0x20, 0x00, 0xF6, 0x00],8)
+# COS_Read_Config(card_service,Des3_Cipher,49162,8,8)
 # COS_Read_Tempture(Des3_Cipher)
