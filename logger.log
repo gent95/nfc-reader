@@ -1,0 +1,394 @@
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_wy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 24, in read_wy
+    card_service = reader.init()
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 26, in init
+    card_service = card_request.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\CardRequest.py", line 68, in waitforcard
+    return self.pcsccardrequest.waitforcard()
+  File "D:\workspace\lib\site-packages\smartcard\pcsc\PCSCCardRequest.py", line 213, in waitforcard
+    raise CardRequestTimeoutException()
+smartcard.Exceptions.CardRequestTimeoutException: Time-out during card request
+ERROR:app:Exception on /read_yy [GET]
+Traceback (most recent call last):
+  File "D:\workspace\lib\site-packages\flask\app.py", line 2073, in wsgi_app
+    response = self.full_dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1518, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1516, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "D:\workspace\lib\site-packages\flask\app.py", line 1502, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**req.view_args)
+  File "D:\workspace\python\nfc-reader\app.py", line 46, in read_yy
+    info_json = reader.COS_Analysis(card_service,Des3_Cipher,60,False)
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 483, in COS_Analysis
+    result_print(info_str, True)
+  File "D:\workspace\python\nfc-reader\securityReader.py", line 32, in result_print
+    logger.info(result_out_str)
+NameError: name 'logger' is not defined
+INFO:root:CID: 72 18 
+TID: 01 11 00 01 00 08 
+GTIN: 00 00 00 00 00 00 11 11 11 11 
+VID: F3 59 3C 90 48 99 35 49 
+MID: F3 59 3C 90 48 99 35 49 
+MAC: 00 00 00 00 00 00 00 00 
+TRNG: 00 00 00 00 41 00 00 00 
+PAGE: 01 
+RNUM: 00 00 00 00 
+CAL1: 0.0 0
+CAL2: 0.0 0
+CAL3: 0.5 1440
+INFO:root:[]
+INFO:root:CID: 72 18 
+TID: 01 11 00 01 00 08 
+GTIN: 00 00 00 00 00 00 11 11 11 11 
+VID: F3 59 3C 90 48 99 35 49 
+MID: F3 59 3C 90 48 99 35 49 
+MAC: 00 00 00 00 00 00 00 00 
+TRNG: 00 00 00 00 41 00 00 00 
+PAGE: 01 
+RNUM: 00 00 00 00 
+CAL1: 0.0 0
+CAL2: 0.0 0
+CAL3: 0.5 32
+INFO:root:[]
+INFO:root:CID: 72 18 
+TID: 01 11 00 01 00 08 
+GTIN: 00 00 00 00 00 00 11 11 11 11 
+VID: F3 59 3C 90 48 99 35 49 
+MID: F3 59 3C 90 48 99 35 49 
+MAC: 00 00 00 00 00 00 00 00 
+TRNG: 00 00 00 00 41 00 00 00 
+PAGE: 01 
+RNUM: 00 00 00 00 
+CAL1: 0.0 0
+CAL2: 0.0 0
+CAL3: 0.5 2080
+INFO:root:[]
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: E2 2C E6 3B 3F C4 AB 11 F3 59 3C 90 48 99 35 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 0F A4 4C 5F 09 E7 CC 31 53 A7 07 32 FD EA 78 E0
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 2A 64 17 18 DC F5 53 CF FC 1C 83 96 FA 21 59 33 status words: 90 0
+INFO:root:sending: A2 A4 00 0C 02 DA 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 00 3C
+INFO:root:serial no.: 10 72 F5 B7 26 2A 18 95 66 6C 60 18 86 D7 DA BC 62 C2 8E 69 48 05 03 70 DF 15 D3 6C 0F 89 55 41 92 C6 C1 A6 7E 91 B6 08 D4 27 43 FF 20 10 20 17 71 99 8B 32 04 DA 19 51 status words: 90 0
+INFO:root:sending: A2 B0 00 3C 3C
+INFO:root:serial no.: 4E 25 FD 6F 0E F9 79 67 71 99 8B 32 04 DA 19 51 46 7D A8 BD C9 E7 73 55 71 99 8B 32 04 DA 19 51 71 99 8B 32 04 DA 19 51 71 99 8B 32 04 DA 19 51 71 99 8B 32 04 DA 19 51 status words: 90 0
+INFO:root:CID: 72 18 
+TID: 01 11 00 01 00 08 
+GTIN: 00 00 00 00 00 00 11 11 11 11 
+VID: F3 59 3C 90 48 99 35 49 
+MID: F3 59 3C 90 48 99 35 49 
+MAC: 00 00 00 00 00 00 00 00 
+TRNG: 00 00 00 00 41 00 00 00 
+PAGE: 01 
+RNUM: 00 00 00 00 
+CAL1: 0.0 0
+CAL2: 0.0 0
+CAL3: 0.5 2336
+INFO:root:[]
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 63 EC 66 56 D8 7D B6 0C F3 59 3C 90 48 99 35 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 86 3C F1 41 5F 7E B5 16 B5 FB 2B 83 0A C6 8C B0
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 7C 35 D2 35 68 02 2C FE 3E EE 4B FE 21 E4 64 B0 status words: 90 0
+INFO:root:sending: A2 A4 00 0C 02 DA 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 00 3C
+INFO:root:serial no.: 3F 73 EE 67 CC 3D 1B C4 69 1B CA B6 9B A4 2B C9 AA 75 20 BF D6 86 AF 7E 53 B5 06 55 F4 1D B0 97 D5 5F 6A 64 63 F7 D1 DE B0 E6 E4 08 36 30 CC 14 F6 A3 99 1D 05 82 58 E3 status words: 90 0
+INFO:root:sending: A2 B0 00 3C 3C
+INFO:root:serial no.: B2 53 ED E7 F8 57 DA 7E F6 A3 99 1D 05 82 58 E3 F7 2E 0D 91 91 B2 74 21 F6 A3 99 1D 05 82 58 E3 F6 A3 99 1D 05 82 58 E3 F6 A3 99 1D 05 82 58 E3 F6 A3 99 1D 05 82 58 E3 status words: 90 0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 33 D8 5A 44 D5 04 36 22 F3 59 3C 90 48 99 35 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 7A CC B3 98 64 54 DD 6F C0 27 96 0B CA 7C DC 14
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: FD 00 B7 85 3C 5F D7 45 20 43 83 B9 F1 7F 47 10 status words: 90 0
+INFO:root:sending: A2 A4 00 0C 02 DA 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 00 3C
+INFO:root:serial no.: FC 34 B4 76 7B 4F 3B 5D 69 E3 8A 13 47 53 F8 EE 54 EA E3 00 06 CB 82 98 91 63 64 A1 EC 1A 70 B2 2C D5 3A 7C E7 E2 6C 69 EE F3 33 1C FC 3F 72 6B 7A 95 47 E2 97 7A 51 AC status words: 90 0
+INFO:root:sending: A2 B0 00 3C 3C
+INFO:root:serial no.: 35 D5 44 31 3E AB EA 1D 7A 95 47 E2 97 7A 51 AC 4D DC 60 45 28 8C CD A6 7A 95 47 E2 97 7A 51 AC 7A 95 47 E2 97 7A 51 AC 7A 95 47 E2 97 7A 51 AC 7A 95 47 E2 97 7A 51 AC status words: 90 0
+INFO:root:CID: 72 18 
+TID: 01 11 00 01 00 08 
+GTIN: 00 00 00 00 00 00 11 11 11 11 
+VID: F3 59 3C 90 48 99 35 49 
+MID: F3 59 3C 90 48 99 35 49 
+MAC: 00 00 00 00 00 00 00 00 
+TRNG: 00 00 00 00 41 00 00 00 
+PAGE: 01 
+RNUM: 00 00 00 00 
+CAL1: 0.0 0
+CAL2: 0.0 0
+CAL3: 0.5 2496
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: C6 2C 79 4D 46 0D CD 2D F3 59 3C 90 48 99 35 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 96 DE 94 33 FA 4F A1 14 05 5B 74 45 EE 88 75 B2
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 34 34 B1 80 8D 68 E2 15 B0 C9 E6 CD 94 FB FC 6C status words: 90 0
+INFO:root:sending: A2 A4 00 0C 02 DA 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 00 3C
+INFO:root:serial no.: E9 D9 83 9A 81 A7 09 98 26 A0 F4 E2 B3 69 D9 F8 AF 30 F1 84 F9 0A E0 49 94 66 98 32 70 28 80 63 08 5F 3A C5 7C FC E1 47 25 D1 5F 4C 6C 9F 93 0C 1C C2 CB C2 F9 E9 2F B2 status words: 90 0
+INFO:root:sending: A2 B0 00 3C 3C
+INFO:root:serial no.: 72 EF 2D FA D8 FB 43 C0 1C C2 CB C2 F9 E9 2F B2 28 DD F6 7A FF B6 3F 6F 1C C2 CB C2 F9 E9 2F B2 1C C2 CB C2 F9 E9 2F B2 1C C2 CB C2 F9 E9 2F B2 1C C2 CB C2 F9 E9 2F B2 status words: 90 0
+INFO:root:CID: 72 18 
+TID: 01 11 00 01 00 08 
+GTIN: 00 00 00 00 00 00 11 11 11 11 
+VID: F3 59 3C 90 48 99 35 49 
+MID: F3 59 3C 90 48 99 35 49 
+MAC: 00 00 00 00 00 00 00 00 
+TRNG: 00 00 00 00 41 00 00 00 
+PAGE: 01 
+RNUM: 00 00 00 00 
+CAL1: 0.0 0
+CAL2: 0.0 0
+CAL3: 0.5 2464
+INFO:root:[]
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: FF 62 6F BA 23 F8 30 12 F3 59 3C 90 48 99 35 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 81 8C B3 48 8B 65 2D B3 83 0B B0 35 26 DC D1 6E
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 1B 81 6E 25 FE 2B AD 4D 9B F1 AA A6 99 DF AF AF status words: 90 0
+INFO:root:COSÊý¾Ý½âÎö
+INFO:root:sending: A2 A4 00 0C 02 DA 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 00 3C
+INFO:root:serial no.: B2 BD C5 04 29 D3 45 F3 31 6A 83 6A 1E 7F 6F 2B F0 B7 E0 15 4B FF 4A D1 E7 34 64 D8 03 C5 4D 9D 8E 08 5F AD E4 ED 41 D7 98 E8 A6 FE 5F C1 3D DE 5E 75 4F AD 71 48 6E C5 status words: 90 0
+INFO:root:sending: A2 B0 00 3C 3C
+INFO:root:serial no.: A6 2D 40 49 46 69 ED BA 5E 75 4F AD 71 48 6E C5 D4 0D 15 7A 60 60 46 36 5E 75 4F AD 71 48 6E C5 5E 75 4F AD 71 48 6E C5 5E 75 4F AD 71 48 6E C5 5E 75 4F AD 71 48 6E C5 status words: 90 0
+INFO:root:{'CID': '72 18 ', 'TID': '01 11 00 01 00 08 ', 'GTIN': '00 00 00 00 00 00 11 11 11 11 ', 'VID': 'F3 59 3C 90 48 99 35 49 ', 'MID': 'F3 59 3C 90 48 99 35 49 ', 'MAC': '00 00 00 00 00 00 00 00 ', 'TRNG': '00 00 00 00 41 00 00 00 ', 'PAGE': '01 ', 'RUNM': '00 00 00 00 ', 'CAL1': {'TEMP': '0.0', 'ADC': '0'}, 'CAL2': {'TEMP': '0.0', 'ADC': '0'}, 'CAL3': {'TEMP': '0.5', 'ADC': '2592'}}
+INFO:root:[]
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 63 c0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 63 c0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 63 c0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 63 c0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 63 c0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 63 c0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
