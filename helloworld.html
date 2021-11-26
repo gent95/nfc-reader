@@ -1,1 +1,115 @@
-<h1>hello word</h1>
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta charset="UTF-8">
+
+<style>
+    #response-container {
+        padding: 5px;
+        margin: 10px;
+        font-size: 120%;
+        border: 5px dashed #ccc;
+        height:500px;
+    }
+
+    label {
+        margin-left: 0.3rem;
+        margin-right: 0.3rem;
+    }
+
+    button {
+        font-size: 100%;
+        padding: 0.5rem;
+        margin: 0.3rem;
+        text-transform: uppercase;
+    }
+
+</style>
+</head>
+<body>
+
+
+<h1>中义NFC读写器V1.1（加密芯片）</h1>
+<p id='pywebview-status'></p>
+<label for="keyA">keyA:</label><input id="keyA" placeholder="请输入keyA">
+<label for="keyB">keyB:</label><input id="keyB" placeholder="请输入keyB">
+<button onClick="read_wy()">读无源温度</button>
+<button onClick="read_yy()">读有源温度</button><br/>
+<button onClick="check_yy_status()">检查有源标签状态</button>
+<button onClick="active_yy()">激活有源标签</button>
+<div id="response-container"></div>
+<script>
+    var container = document.getElementById('pywebview-status')
+    container.innerHTML = '<i style="color:red;">读写器未就绪</i>'
+    window.addEventListener('pywebviewready', function() {
+        container.innerHTML = '<i style="color:green;">读写器已就绪</i>'
+    })
+
+    function getKey(){
+        var keyA = document.getElementById('keyA').value.replace(/\s/g,'')
+        var keyB = document.getElementById('keyB').value.replace(/\s/g,'')
+        var reg = /[a-zA-Z0-9]{16,16}$/;
+        if (keyA && keyB) {
+             if(!reg.test(keyA) || !reg.test(keyB)){
+                alert('keyA keyB必须为16位数字和字母')
+                return
+             }
+        }else{
+            alert('keyA keyB不能为空')
+            return
+        }
+        return [keyA,keyB]
+    }
+
+    function showResult(result){
+        var container = document.getElementById('response-container')
+        container.innerText = JSON.stringify(result)
+    }
+
+    function read_wy() {
+        var arg =  getKey()
+        var keyA = arg[0]
+        var keyB = arg[1]
+        pywebview.api.read_wy(keyA,keyB).then(result=>{
+            showResult(result)
+        }).catch(err=>{
+            showResult(err)
+        })
+         
+    }
+
+	function read_yy() {
+        var arg =  getKey()
+        var keyA = arg[0]
+        var keyB = arg[1]
+        pywebview.api.read_yy(keyA,keyB).then(result=>{
+            showResult(result)
+        }).catch(err=>{
+            showResult(err)
+        })
+    }
+
+    function active_yy(){
+        var arg =  getKey()
+        var keyA = arg[0]
+        var keyB = arg[1]
+        pywebview.api.active_yy(keyA,keyB).then(result=>{
+            showResult(result)
+        }).catch(err=>{
+            showResult(err)
+        })
+    }
+
+    function check_yy_status(){
+        var arg =  getKey()
+        var keyA = arg[0]
+        var keyB = arg[1]
+        pywebview.api.check_yy_status(keyA,keyB).then(result=>{
+            showResult(result)
+        }).catch(err=>{
+            showResult(err)
+        })
+    }
+</script>
+</body>
+</html>

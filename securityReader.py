@@ -29,6 +29,7 @@ def init():
   return card_service
 
 def result_print(result_out_str):
+  print(result_out_str)
   logging.info(result_out_str)
 
 def trace_command(apdu):
@@ -136,7 +137,9 @@ def COS_Access(card_service,KEYA_str, KEYB_str):
     # 加密随机数
     random_key_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), random_int_list))
     trnd_encrpyt_bytes = Des3_Cipher.encrypt(random_key_bytes)
-    trnd_bytes= rnd.randbytes(8)
+    # trnd_bytes= rnd.randbytes(8)
+
+    trnd_bytes = [0xA2,0xD6,0x00,0x10,0x10,0x00,0x10,0x10]
 
     command_bytes = [0xA2,0xD6,0x00,0x10,0x10]
     command_bytes.extend(trnd_encrpyt_bytes)
@@ -330,7 +333,7 @@ def COS_Read_Config(card_service,Des3_Cipher, address_int, length_int, package_s
   data_str = bytes2hexstr(data_bytes)
   result = True
   result_print('config file :'+ data_str)
-  return result, data_bytes
+  return data_bytes
 
 # 修改配置文件
 def COS_Write_Config(card_service,Des3_Cipher, address_int, length_int, write_bytes, package_size):
@@ -538,10 +541,14 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
     plt.xlabel('time')
     plt.show()
   return info_json
+
+
+# def active():
+
 # card_service = init()
 # Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
 # COS_Analysis(card_service,Des3_Cipher,60,False)
 # COS_Write_Config(card_service,Des3_Cipher,49162,8,[0xF0, 0x03, 0x00, 0x0F, 0x20, 0x00, 0xF6, 0x00],8)
-# COS_Read_Config(card_service,Des3_Cipher,49162,8,8)
+# data_bytes = COS_Read_Config(card_service,Des3_Cipher,49162,8,8)
 # COS_Read_Tempture(Des3_Cipher)
-a = rnd.randbytes(8)
+# a = rnd.randbytes(8)
