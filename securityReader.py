@@ -542,10 +542,17 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
     plt.show()
   return info_json
 
+# 读取芯片UID
+def read_uid(card_service):
+  rf_command_bytes = [0xFF,0xCA,0x00,0x00,0x00]
+  res,s1,s2 = sendCommand(card_service,rf_command_bytes)
+  return bytes2hexstr(res)
 
-# def active():
+
 
 # card_service = init()
+# result = read_uid(card_service)
+# print(result)
 # Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
 # COS_Analysis(card_service,Des3_Cipher,60,False)
 # COS_Write_Config(card_service,Des3_Cipher,49162,8,[0xF0, 0x03, 0x00, 0x0F, 0x20, 0x00, 0xF6, 0x00],8)

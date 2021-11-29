@@ -49,6 +49,10 @@ class Api:
         else:
             return '芯片未激活'
 
+    def read_uid(self):
+        card_service = reader.init()
+        uid = reader.read_uid(card_service)
+        return uid
 if __name__ == '__main__':
     api = Api()
     window = webview.create_window('中义NFC读写器', url='helloworld.html', js_api=api)
