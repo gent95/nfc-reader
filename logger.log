@@ -392,3 +392,9 @@ INFO:root:sending: A2 A4 00 0C 02 AC 01
 INFO:root:sending: A2 A4 00 0C 02 AC 01
 INFO:root:serial no.:  status words: 63 c0
 INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:sending: FF CA 00 00 00
+INFO:root:serial no.: 99 35 49 11 status words: 90 0
+INFO:root:sending: FF CA 00 00 00
+INFO:root:serial no.: 99 35 49 11 status words: 90 0
+INFO:root:sending: FF CA 00 00 00
+INFO:root:serial no.: 04 88 B7 49 10 02 69 status words: 90 0
