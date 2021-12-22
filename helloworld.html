@@ -13,15 +13,15 @@
         overflow:hidden;
     }
     #response-container {
-        padding: 5px;
-        margin: 10px;
+        /* padding: 5px; */
         font-size: 120%;
         border: 5px dashed #ccc;
-        height:400px;
+        height:395px;
     }
 
     #write_data{
-      height:200px;
+      height:400px;
+      margin-right: 2%;
     }
 
     label {
@@ -36,7 +36,23 @@
         text-transform: uppercase;
     }
     .inline{
-      display:inline-block
+      display:inline-block;
+      display: flex;
+      justify-content: space-between;
+    }
+    .inline textarea,.inline > div{
+        width: 49%;
+    }
+    .title{
+        display: flex;
+        justify-content: space-between;
+    }
+    .title :first-child{
+        width: 49%;
+        margin-right: 2%;
+    }
+    .title :last-child{
+        width: 49%;
     }
 </style>
 </head>
@@ -56,8 +72,14 @@
 <button onClick="active_yy()">激活有源标签</button>
 <button onclick="write_data()">写入数据</button>
 <div>
-  <div class="inline"><label>写入数据</label><textarea id="write_data"></textarea></div>
-  <div class="inline"><label>结果显示</label><div id="response-container"></div></div>
+    <div class="title">
+        <div>写入数据</div>
+        <div>结果显示</div>
+    </div>
+    <div class="inline">
+        <textarea id="write_data"></textarea>
+        <div id="response-container"></div>
+    </div>
 </div>
 
 
