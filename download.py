@@ -31,7 +31,10 @@ def request_download(chipNum):
 	#邦德威pdf
 	# pdf_url = 'http://121.229.41.37:8091/file/pdf/'+str(chipNum)+'_.pdf'
 	#evvm 厂家pdf
-	pdf_url = 'http://evvmapi.vandh.org/file/pdf/'+str(chipNum)+'_.pdf'
+	# pdf_url = 'http://evvmapi.vandh.org/file/pdf/'+str(chipNum)+'_.pdf'
+
+	#中义宝宝
+	pdf_url = ''
 	r = requests.get(pdf_url)
 	with open('./image/'+chipNum+'.pdf', 'wb') as f:
 		f.write(r.content)  
@@ -43,9 +46,12 @@ def export_pdf():
 	# sql = 'SELECT * FROM `evvm_ws`.`chip` WHERE `factoryId` = 153 AND `status` = 6' 
 
 	# evvm
-	conn,cur = mysqlConnectionInit('119.3.178.181',3306,'majt','t8D!CyUCGlKD','evvm')
-	sql = 'SELECT * FROM `evvm`.`chip` WHERE `factoryId` = 166 AND `status` <> 1 AND `status` <> 0'
+	# conn,cur = mysqlConnectionInit('119.3.178.181',3306,'majt','t8D!CyUCGlKD','evvm')
+	# sql = 'SELECT * FROM `evvm`.`chip` WHERE `factoryId` = 166 AND `status` <> 1 AND `status` <> 0'
 
+	# 中义宝宝
+	conn,cur = mysqlConnectionInit('49.4.13.135',3306,'root','zy123456','zy-zybb')
+	sql = 'select * from chip where factoryId = 2 and `status` = 6'
 	data = execSelect(conn,cur,sql)
 	for row in data[:]:
 		request_download(row[0])
@@ -53,7 +59,7 @@ def export_pdf():
 
 #初始化es连接对象
 def elasticsearch_connection_init():
-	es = Elasticsearch(["125.124.132.156:9201"])
+	es = Elasticsearch(["elasticsearch.vandh.cn"],http_auth=['elastic','pO0chX3dOjDFRx75VZC3'],port=80)
 	return es
 
 
@@ -88,6 +94,7 @@ def elasticsearch_export(es,businessId):
 	return data
 
 
+
 #导出vvm温度数据到excel
 
 def exportES2excel():
@@ -117,3 +124,18 @@ def exportES2excel():
 # 	data = cur.execute(sql,param) # 执行SQL语句
 	
 # conn.commit()
+body = {
+		"size": 10,
+		"from": 0,
+		"sort": [
+		    {
+		        "createTime.keyword":{
+		            "order":"asc"
+		        }
+		    }
+		    ]
+	}
+
+es = elasticsearch_connection_init()
+data = es.search(index="fxc-temp", body=body)
+print(data)

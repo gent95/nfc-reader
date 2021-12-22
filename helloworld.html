@@ -2,14 +2,26 @@
 <html>
 <head lang="en">
 <meta charset="UTF-8">
-
+  <!-- 导入样式 -->
+  <link rel="stylesheet" href="http://cdn.jsdelivr.net/npm/element-plus/dist/index.css"/>
+  <!-- 导入 Vue 3 -->
+  <script src="http://cdn.jsdelivr.net/npm/vue@next"></script>
+  <!-- 导入组件库 -->
+  <script src="http://cdn.jsdelivr.net/npm/element-plus"></script>
 <style>
+    *{
+        overflow:hidden;
+    }
     #response-container {
         padding: 5px;
         margin: 10px;
         font-size: 120%;
         border: 5px dashed #ccc;
-        height:500px;
+        height:400px;
+    }
+
+    #write_data{
+      height:200px;
     }
 
     label {
@@ -23,7 +35,9 @@
         margin: 0.3rem;
         text-transform: uppercase;
     }
-
+    .inline{
+      display:inline-block
+    }
 </style>
 </head>
 <body>
@@ -31,13 +45,23 @@
 
 <h1>中义NFC读写器V1.1（加密芯片）</h1>
 <p id='pywebview-status'></p>
-<label for="keyA">keyA:</label><input id="keyA" placeholder="请输入keyA">
-<label for="keyB">keyB:</label><input id="keyB" placeholder="请输入keyB">
+
+<label for="keyA">keyA:</label><input id="keyA" placeholder="请输入keyA" value="A0 A1 A2 A3 A4 A5 A6 A7">
+<label for="keyB">keyB:</label><input id="keyB" placeholder="请输入keyB" value="A8 A9 AA AB AC AD AE AF"><br/>
+<el-button type="primary">Primary</el-button>
+<button onClick="read_uid()">读UID</button>
 <button onClick="read_wy()">读无源温度</button>
-<button onClick="read_yy()">读有源温度</button><br/>
-<button onClick="check_yy_status()">检查有源标签状态</button>
+<button onClick="read_yy()">读有源温度</button>
+<button onClick="check_yy_status()">检查有源状态</button>
 <button onClick="active_yy()">激活有源标签</button>
-<div id="response-container"></div>
+<button onclick="write_data()">写入数据</button>
+<div>
+  <div class="inline"><label>写入数据</label><textarea id="write_data"></textarea></div>
+  <div class="inline"><label>结果显示</label><div id="response-container"></div></div>
+</div>
+
+
+
 <script>
     var container = document.getElementById('pywebview-status')
     container.innerHTML = '<i style="color:red;">读写器未就绪</i>'
@@ -105,6 +129,26 @@
         var keyA = arg[0]
         var keyB = arg[1]
         pywebview.api.check_yy_status(keyA,keyB).then(result=>{
+            showResult(result)
+        }).catch(err=>{
+            showResult(err)
+        })
+    }
+
+     function read_uid(){
+        pywebview.api.read_uid().then(result=>{
+            showResult(result)
+        }).catch(err=>{
+            showResult(err)
+        })
+    }
+
+    function write_data(){
+      var arg =  getKey()
+        var keyA = arg[0]
+        var keyB = arg[1]
+        var write_data = document.getElementById('write_data').value.replace(/\s/g,'')
+      pywebview.api.write_data(keyA,keyB,write_data).then(result=>{
             showResult(result)
         }).catch(err=>{
             showResult(err)

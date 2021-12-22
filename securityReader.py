@@ -13,6 +13,8 @@ import time as tm
 import matplotlib.pyplot as plt
 import math
 import logging
+import binascii
+import struct
 
 # 通过下面的方式进行简单配置输出方式与日志级别
 logging.basicConfig(filename='logger.log', level=logging.INFO)
@@ -22,7 +24,7 @@ logging.basicConfig(filename='logger.log', level=logging.INFO)
 def init():
   print('初始化读卡器')
   card_type = AnyCardType()
-  card_request = CardRequest(timeout=1, cardType=card_type)
+  card_request = CardRequest(timeout=50000, cardType=card_type)
   card_service = card_request.waitforcard()
   card_service.connection.connect()
   # atr = ATR(card_service.connection.getATR())
@@ -111,10 +113,9 @@ def COS_Access(card_service,KEYA_str, KEYB_str):
     print('开始ACCESS验证')
     rf_command_bytes = [ 0xA2, 0xA4, 0x00, 0x0C, 0x02, 0xAC, 0x01]
     data_byres,s1,s2 = sendCommand(card_service,rf_command_bytes)
-
     if s1==99 and s2 == 192:
       print('解锁标签')  
-      tm.sleep(15)
+      tm.sleep(20)
       rf_command_bytes = [ 0xA2, 0xA4, 0x00, 0x0C, 0x02, 0xAC, 0x01]
       data_byres,s1,s2 = sendCommand(card_service,rf_command_bytes)
       return
@@ -144,13 +145,14 @@ def COS_Access(card_service,KEYA_str, KEYB_str):
     command_bytes = [0xA2,0xD6,0x00,0x10,0x10]
     command_bytes.extend(trnd_encrpyt_bytes)
     command_bytes.extend(trnd_bytes)
-
     res,s1,s2 = sendCommand(card_service,command_bytes)
-
     if s1 == 144 and s2 == 0:
       res,s1,s2 = sendCommand(card_service,[0xA2,0xB0,0x00,0x10,0x10])
-      # sendCommand(res)
-      # trnd_encrpyt_bytes = Des3_Cipher.encrypt(trnd_bytes)
+      trnd_bytes = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), trnd_bytes))
+      trnd_encrpyt_bytes = Des3_Cipher.encrypt(trnd_bytes)
+      if bytes2hexstr(trnd_encrpyt_bytes) == bytes2hexstr(res[0:8]):
+          print('验证成功')
+
 
     return Des3_Cipher
 
@@ -184,6 +186,7 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
   data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, 60)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
+  print('report: '+bytes2hexstr(data_bytes))
   # 解析数据
   data_bias = 12
   CID_bytes  = data_bytes[data_bias+0: data_bias+2]
@@ -245,7 +248,7 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
   k = (tempture1-tempture2)/(adc1-adc2)
   b = tempture1 - (k*adc1)
   tempture_float = k*adc_data_int + b
-  info_json['tempture_data'] = tempture_float
+  info_json['tempture_data'] = round(tempture_float,2)
   return info_json
 
 # 读数据
@@ -265,6 +268,7 @@ def ISO14443_4A_ReadBinary(card_service,cla_bytes, address_start_int, length_int
     rf_command_bytes = [cla_bytes,0xB0]
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_size_int]))
+
     data_bytes, s1,s2 = sendCommand(card_service,rf_command_bytes)
     if s1 == 144 and s2 == 0:
       data_read_bytes.extend(data_bytes)
@@ -302,6 +306,7 @@ def ISO14443_4A_UpdateBinary(card_service,cla_bytes, address_start_int, length_i
     rf_command_bytes.extend(bytes([package_size_int]))
     rf_command_bytes.extend(data_write_bytes[i*package_size_int : (i+1)*package_size_int])
     data_bytes,s1,s2 = sendCommand(card_service,rf_command_bytes)
+    tm.sleep(0.01)
   # 写剩余数据
   if package_bytes_left_int!=0:
     # tm.sleep(0.01)
@@ -316,7 +321,8 @@ def ISO14443_4A_UpdateBinary(card_service,cla_bytes, address_start_int, length_i
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_bytes_left_int]))
     rf_command_bytes.extend(data_write_bytes[i*package_size_int:i*package_size_int+package_bytes_left_int])
-    data_bytes, s1,s2 = sendCommand(card_service,command_bytes)
+    data_bytes, s1,s2 = sendCommand(card_service,rf_command_bytes)
+    tm.sleep(0.01)
   return data_bytes
 
 # 读取配置文件
@@ -335,12 +341,45 @@ def COS_Read_Config(card_service,Des3_Cipher, address_int, length_int, package_s
   result_print('config file :'+ data_str)
   return data_bytes
 
+# 读取配置文件
+def COS_Read_Data(card_service,Des3_Cipher, address_int, length_int, package_size):
+  result_print("COS读取DATA数据")
+  result = False
+  # 选中CONFIG
+  rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0x00,0x01]
+  data_bytes, s1,s2  = sendCommand(card_service,rf_command_bytes)
+  # 读数据
+  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, address_int, length_int, package_size)
+  data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
+  data_bytes = Des3_Cipher.decrypt(data_bytes)
+  data_str = bytes2hexstr(data_bytes)
+  result = True
+  result_print('DATA file :'+ data_str)
+  return data_bytes
+
 # 修改配置文件
 def COS_Write_Config(card_service,Des3_Cipher, address_int, length_int, write_bytes, package_size):
   result_print("COS写入配置数据")
   result = False
   # 选中CONFIG
   rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0xCF,0x01]
+  data_bytes, s1, s2 = sendCommand(card_service,rf_command_bytes)
+  write_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), write_bytes))
+  data_write_bytes = Des3_Cipher.encrypt(write_bytes)
+  data_bytes = ISO14443_4A_UpdateBinary(card_service,0xA2, address_int, length_int, data_write_bytes, package_size)
+  if data_bytes!=b'':
+    result = True
+    result_print("COS写入配置数据 成功")
+  if result == False:
+    result_print("COS写入配置数据 失败")
+  return result
+
+# 修改data文件
+def COS_Write_Data(card_service,Des3_Cipher, address_int, length_int, write_bytes, package_size):
+  result_print("COS写入data数据")
+  result = False
+  # 选中CONFIG
+  rf_command_bytes = [0xA2,0xA4,0x00,0x0C,0x02,0x00,0x01]
   data_bytes, s1, s2 = sendCommand(card_service,rf_command_bytes)
   write_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), write_bytes))
   data_write_bytes = Des3_Cipher.encrypt(write_bytes)
@@ -366,6 +405,7 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
   data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, DATA_SIZE)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
+  print('report: '+bytes2hexstr(data_bytes))
   # 解析数据
   data_bias = 12
   CID_bytes  = data_bytes[data_bias+0: data_bias+2]
@@ -381,18 +421,6 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
     RES_bytes  = data_bytes[data_bias+55:data_bias+58]
     K_bytes    = data_bytes[data_bias+58:data_bias+62]
     B_bytes    = data_bytes[data_bias+62:data_bias+66]
-    info_str =  "CID: "  + bytes2hexstr(CID_bytes)  + "\n" + \
-                "TID: "  + bytes2hexstr(TID_bytes)  + "\n" + \
-                "GTIN: " + bytes2hexstr(GTIN_bytes) + "\n" + \
-                "VID: "  + bytes2hexstr(VID_bytes)  + "\n" + \
-                "MID: "  + bytes2hexstr(MID_bytes)  + "\n" + \
-                "MAC: "  + bytes2hexstr(MAC_bytes)  + "\n" + \
-                "TRNG: " + bytes2hexstr(TRNG_bytes) + "\n" + \
-                "PAGE: " + bytes2hexstr(PAGE_bytes) + "\n" + \
-                "RNUM: " + bytes2hexstr(RNUM_bytes) + "\n" + \
-                "RES: "  + bytes2hexstr(RES_bytes)  + "\n" + \
-                "K: "    + bytes2hexstr(K_bytes)    + "\n" + \
-                "B: "    + bytes2hexstr(B_bytes)
     info_json = {
           "CID":bytes2hexstr(CID_bytes),
           "TID":bytes2hexstr(TID_bytes),
@@ -415,19 +443,6 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
     Cal_Data[1][1] = (data_bytes[data_bias+59]&0x0F)*256 + data_bytes[data_bias+60]
     Cal_Data[2][0] = (data_bytes[data_bias+61]*16 + (data_bytes[data_bias+62]>>4))/10
     Cal_Data[2][1] = (data_bytes[data_bias+62]&0x0F)*256 + data_bytes[data_bias+63]
-    info_str =  "CID: "  + bytes2hexstr(CID_bytes)  + "\n" + \
-                "TID: "  + bytes2hexstr(TID_bytes)  + "\n" + \
-                "GTIN: " + bytes2hexstr(GTIN_bytes) + "\n" + \
-                "VID: "  + bytes2hexstr(VID_bytes)  + "\n" + \
-                "MID: "  + bytes2hexstr(MID_bytes)  + "\n" + \
-                "MAC: "  + bytes2hexstr(MAC_bytes)  + "\n" + \
-                "TRNG: " + bytes2hexstr(TRNG_bytes) + "\n" + \
-                "PAGE: " + bytes2hexstr(PAGE_bytes) + "\n" + \
-                "RNUM: " + bytes2hexstr(RNUM_bytes) + "\n" + \
-                "CAL1: " + str(Cal_Data[0][0])  + " " + str(Cal_Data[0][1]) + "\n" + \
-                "CAL2: " + str(Cal_Data[1][0])  + " " + str(Cal_Data[1][1]) + "\n" + \
-                "CAL3: " + str(Cal_Data[2][0])  + " " + str(Cal_Data[2][1])
-
     info_json = {
         "CID":bytes2hexstr(CID_bytes),
         "TID":bytes2hexstr(TID_bytes),
@@ -517,6 +532,9 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
           adc1 = Cal_Data[1][1]
           tempture2 = Cal_Data[2][0]
           adc2 = Cal_Data[2][1]
+        if (adc1 - adc2) == 0:
+            print('标签未标定')
+            return info_json
         k = (tempture1-tempture2)/(adc1-adc2)
         b = tempture1 - (k*adc1)
         tempture_float = k*adc_data_int + b
@@ -548,14 +566,42 @@ def read_uid(card_service):
   res,s1,s2 = sendCommand(card_service,rf_command_bytes)
   return bytes2hexstr(res)
 
+def write_data(card_service,Des3_Cipher,write_bytes):
+    print('进来了')
+    COS_Write_Config(card_service, Des3_Cipher, 49216, len(write_bytes), write_bytes, 56)
+    data_bytes = COS_Read_Config(card_service, Des3_Cipher, 49216, len(write_bytes), 56)
+    data_bytes = data_bytes[:len(data_bytes)]
+    result = bytes.decode(data_bytes[:len(data_bytes) -16])
+    return result
+
+
+
 
 
 # card_service = init()
 # result = read_uid(card_service)
-# print(result)
 # Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
-# COS_Analysis(card_service,Des3_Cipher,60,False)
+
+
+# Des3_Cipher = COS_Access(card_service,'0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07','0x08 0x09 0x00 0x0B 0x0C 0x0D 0x0E 0x0F')
+# COS_Analysis(card_service,Des3_Cipher,56,False)
+
 # COS_Write_Config(card_service,Des3_Cipher,49162,8,[0xF0, 0x03, 0x00, 0x0F, 0x20, 0x00, 0xF6, 0x00],8)
+
+
 # data_bytes = COS_Read_Config(card_service,Des3_Cipher,49162,8,8)
-# COS_Read_Tempture(Des3_Cipher)
+# COS_Read_Tempture(card_service,Des3_Cipher)
 # a = rnd.randbytes(8)
+#
+# write_str = '毛毛;;15751396666;;子涵;;202112170001;;浙江省杭州市萧山啊啊区鸿兴路111号;;data:image/jpeg;base64,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'
+# str2byte = bytes(write_str, encoding = "utf8")
+# print(bytes2hexstr(str2byte))
+
+
+# COS_Write_Config(card_service,Des3_Cipher,49216,len(str2byte),str2byte,56)
+#
+# data_bytes = COS_Read_Config(card_service,Des3_Cipher,49216,len(str2byte),56)
+# print(str2byte)
+# print(data_bytes)
+# print(bytes.decode(data_bytes[:len(data_bytes) -16]))
+

@@ -1,7 +1,3 @@
-import threading
-import time
-import sys
-import random
 import webview
 import securityReader as reader
 
@@ -53,7 +49,19 @@ class Api:
         card_service = reader.init()
         uid = reader.read_uid(card_service)
         return uid
+
+    def write_data(self,keya,keyb,write_str):
+        card_service = reader.init()
+        Des3_Cipher = reader.COS_Access(card_service, keya, keyb)
+        write_bytes = bytes(write_str, encoding="utf8")
+        print(write_str)
+        if len(write_bytes) >= 4031:
+            return '写入数据太大啦'
+        result = reader.write_data(card_service,Des3_Cipher,write_bytes)
+        return result
+
+
 if __name__ == '__main__':
     api = Api()
-    window = webview.create_window('中义NFC读写器', url='helloworld.html', js_api=api)
+    window = webview.create_window('中义NFC读写器', url='helloworld.html', js_api=api,resizable=False,width=800,height=800)
     webview.start(debug = True)
