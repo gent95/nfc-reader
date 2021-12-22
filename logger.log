@@ -13952,3 +13952,89 @@ DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
 DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
 DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
 DEBUG:pywebview:Using WinForms / EdgeHTML
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:Using WinForms / EdgeHTML
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: FC 9E 0A CB 02 B8 93 E5 F3 59 3C 90 48 A9 55 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 85 62 48 58 0B CC A0 18 A2 D6 00 10 10 00 10 10
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 0C DF 71 CC 5C E5 BC 19 83 35 12 F7 FC 7F 86 DF status words: 90 0
+INFO:root:COS写入配置数据
+INFO:root:sending: A2 A4 00 0C 02 CF 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 29 DC 69 C9 9C BB F4 38 F3 59 3C 90 48 A9 55 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 50 A8 F8 62 B6 8A 29 64 A2 D6 00 10 10 00 10 10
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 73 58 74 53 FA A2 4E 23 D8 EE F2 63 E0 3E BF C7 status words: 90 0
+INFO:root:COS写入配置数据
+INFO:root:sending: A2 A4 00 0C 02 CF 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 D6 C0 40 08 FD 5E 24 D4 48 99 70 E6
+INFO:root:serial no.:  status words: 90 0
+INFO:root:COS写入配置数据 成功
+INFO:root:COS读取配置数据
+INFO:root:sending: A2 A4 00 0C 02 CF 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 C0 40 38
+INFO:root:serial no.: FD 5E 24 D4 48 99 70 E6 38 10 20 EB BA 19 96 25 F1 C8 4C 9C 1E 91 21 D5 CA 67 BE BF 44 4A 68 1B 99 D9 89 3A AC 4C 13 87 95 84 09 7B 6D 27 72 6D AA 25 DB F0 8E FD 01 90 status words: 90 0
+INFO:root:config file :31 32 33 31 32 33 31 32 31 35 37 35 31 33 39 36 36 36 36 3B 3B E5 AD 90 E6 B6 B5 3B 3B 32 30 32 31 31 32 31 37 30 30 30 31 3B 3B E6 B5 99 E6 B1 9F E7 9C 81 E6 9D AD E5 
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 90 F4 BD DB D4 6F 3A B2 F3 59 3C 90 48 A9 55 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 03 F0 4F 8E 5A EF 0B 31 A2 D6 00 10 10 00 10 10
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 71 5E 73 BD 22 1F 90 49 97 C0 31 53 7E 88 70 C4 status words: 90 0
+INFO:root:COS写入配置数据
+INFO:root:sending: A2 A4 00 0C 02 CF 01
+INFO:root:serial no.:  status words: 90 0
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:Using WinForms / EdgeHTML
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 25 7F AE 05 03 48 FC 54 F3 59 3C 90 48 A9 55 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 0C 00 60 C9 6E 26 8D 04 A2 D6 00 10 10 00 10 10
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: B5 FA 32 2F 7E 8F EE E4 62 DE 24 39 A2 6F 52 39 status words: 90 0
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:Using WinForms / EdgeHTML
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 3F 02 F7 58 53 3A AE B8 F3 59 3C 90 48 A9 55 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 52 0F F5 FA E2 F4 6C E5 A2 D6 00 10 10 00 10 10
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: BA 62 DF B5 0D DC F3 B9 84 05 D7 07 1E 3E BE BE status words: 90 0
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:[WinError 2] 系统找不到指定的文件。
+DEBUG:pywebview:Using WinForms / EdgeHTML
+INFO:root:sending: A2 A4 00 0C 02 AC 01
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: 3C 31 0F 4D 0B C4 0A EA F3 59 3C 90 48 A9 55 49 status words: 90 0
+INFO:root:sending: A2 D6 00 10 10 F5 2C FF 55 4A 0E 15 B0 A2 D6 00 10 10 00 10 10
+INFO:root:serial no.:  status words: 90 0
+INFO:root:sending: A2 B0 00 10 10
+INFO:root:serial no.: BD DE 56 F1 D6 7A 1B A3 56 8C 18 06 D9 F4 C8 1A status words: 90 0

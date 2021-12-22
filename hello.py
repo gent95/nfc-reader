@@ -54,7 +54,7 @@ class Api:
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service, keya, keyb)
         write_bytes = bytes(write_str, encoding="utf8")
-        print(write_str)
+
         if len(write_bytes) >= 4031:
             return '写入数据太大啦'
         result = reader.write_data(card_service,Des3_Cipher,write_bytes)

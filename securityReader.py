@@ -605,3 +605,7 @@ def write_data(card_service,Des3_Cipher,write_bytes):
 # print(data_bytes)
 # print(bytes.decode(data_bytes[:len(data_bytes) -16]))
 
+current_words = [0xff]
+current_words = current_words + [0xff] * (10 - len(current_words))
+print(current_words)
+
