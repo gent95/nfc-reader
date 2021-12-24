@@ -1,67 +1,51 @@
 <!DOCTYPE html>
 <html>
 <head lang="en">
-<meta charset="UTF-8">
-  <!-- 导入样式 -->
-  <link rel="stylesheet" href="http://cdn.jsdelivr.net/npm/element-plus/dist/index.css"/>
-  <!-- 导入 Vue 3 -->
-  <script src="http://cdn.jsdelivr.net/npm/vue@next"></script>
-  <!-- 导入组件库 -->
-  <script src="http://cdn.jsdelivr.net/npm/element-plus"></script>
-<style>
-    *{
-        overflow:hidden;
-    }
-    #response-container {
-        padding: 5px;
-        margin: 10px;
-        font-size: 120%;
-        border: 5px dashed #ccc;
-        height:400px;
-    }
+    <meta charset="UTF-8">
+    <!-- 导入样式 -->
+    <link rel="stylesheet" type="text/css" href="https://www.layuicdn.com/layui/css/layui.css"/>
+    <style>
 
-    #write_data{
-      height:200px;
-    }
-
-    label {
-        margin-left: 0.3rem;
-        margin-right: 0.3rem;
-    }
-
-    button {
-        font-size: 100%;
-        padding: 0.5rem;
-        margin: 0.3rem;
-        text-transform: uppercase;
-    }
-    .inline{
-      display:inline-block
-    }
-</style>
+    </style>
 </head>
 <body>
 
+<fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+    <legend>欢迎使用中义NFC读写工具</legend>
+</fieldset>
 
-<h1>中义NFC读写器V1.1（加密芯片）</h1>
-<p id='pywebview-status'></p>
+<blockquote id='pywebview-status' class="layui-elem-quote layui-text"></blockquote>
+<div class="layui-form-item">
+    <div class="layui-inline">
+        <label class="layui-form-label">keyA:</label>
+        <div class="layui-input-block">
+            <input id="keyA" type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入keyA"
+                   class="layui-input" value="A0 A1 A2 A3 A4 A5 A6 A7">
+        </div>
+    </div>
+    <div class="layui-inline">
+        <label class="layui-form-label">keyB:</label>
+        <div class="layui-input-block">
+            <input id="keyB" type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入keyA"
+                   class="layui-input" value="A8 A9 AA AB AC AD AE AF">
+        </div>
+    </div>
 
-<label for="keyA">keyA:</label><input id="keyA" placeholder="请输入keyA" value="A0 A1 A2 A3 A4 A5 A6 A7">
-<label for="keyB">keyB:</label><input id="keyB" placeholder="请输入keyB" value="A8 A9 AA AB AC AD AE AF"><br/>
-<el-button type="primary">Primary</el-button>
-<button onClick="read_uid()">读UID</button>
-<button onClick="read_wy()">读无源温度</button>
-<button onClick="read_yy()">读有源温度</button>
-<button onClick="check_yy_status()">检查有源状态</button>
-<button onClick="active_yy()">激活有源标签</button>
-<button onclick="write_data()">写入数据</button>
-<div>
-  <div class="inline"><label>写入数据</label><textarea id="write_data"></textarea></div>
-  <div class="inline"><label>结果显示</label><div id="response-container"></div></div>
 </div>
 
+<button class="layui-btn layui-btn-primary layui-border-blue" onClick="read_uid()">读UID</button>
+<button class="layui-btn layui-btn-primary layui-border-green" onClick="read_wy()">读无源温度</button>
+<button class="layui-btn layui-btn-primary layui-border-orange" onClick="read_yy()">读有源温度</button>
+<button class="layui-btn layui-btn-primary layui-border-red" onClick="check_yy_status()">检查有源状态</button>
+<button class="layui-btn layui-btn-primary layui-border-black" onClick="active_yy()">激活有源标签</button>
+<button class="layui-btn layui-btn-primary layui-border-teal" onclick="read_data()">读自定义信息</button>
+<div style="margin-top:10px;">
+    <textarea id="write_data" placeholder="请输入内容" class="layui-textarea"></textarea>
+    <button class="layui-btn layui-btn-normal" onclick="write_data()">写入数据</button>
+    <pre id="response-container" class="layui-code" lay-title="日志展示" lay-height="300" lay-skin="notepad" lay-encode=""></pre>
+</div>
 
-
+<script src="https://www.layuicdn.com/layui/layui.js"></script>
 <script>
     var container = document.getElementById('pywebview-status')
     container.innerHTML = '<i style="color:red;">读写器未就绪</i>'
@@ -84,7 +68,6 @@
         }
         return [keyA,keyB]
     }
-
     function showResult(result){
         var container = document.getElementById('response-container')
         container.innerText = JSON.stringify(result)
@@ -99,17 +82,23 @@
         }).catch(err=>{
             showResult(err)
         })
-         
-    }
 
+    }
 	function read_yy() {
         var arg =  getKey()
         var keyA = arg[0]
         var keyB = arg[1]
+        var loading = layer.load(1, {
+            time: 3*1000,
+            title: '加载中..',
+            shade: [0.5,'#000']
+        });
         pywebview.api.read_yy(keyA,keyB).then(result=>{
-            showResult(result)
+            showResult(result);
+            layer.close(loading);
         }).catch(err=>{
             showResult(err)
+            layer.close(loading);
         })
     }
 
@@ -144,16 +133,47 @@
     }
 
     function write_data(){
+        var loading = layer.load(1, {
+            time: 3*1000,
+            title: '加载中..',
+            shade: [0.5,'#000']
+        });
       var arg =  getKey()
         var keyA = arg[0]
         var keyB = arg[1]
         var write_data = document.getElementById('write_data').value.replace(/\s/g,'')
+        if(write_data.length == 0){
+            alert('写入数据不能为空')
+            return
+        }
       pywebview.api.write_data(keyA,keyB,write_data).then(result=>{
             showResult(result)
+            layer.close(loading);
         }).catch(err=>{
+            layer.close(loading);
             showResult(err)
         })
     }
+
+    function read_data(){
+       var loading = layer.load(1, {
+            time: 3*10000,
+            title: '加载中..',
+            shade: [0.5,'#000']
+        });
+      var arg =  getKey()
+      var keyA = arg[0]
+      var keyB = arg[1]
+      pywebview.api.read_data(keyA,keyB).then(result=>{
+            showResult(result)
+            layer.close(loading);
+        }).catch(err=>{
+            layer.close(loading);
+            showResult(err)
+        })
+    }
+
+
 </script>
 </body>
 </html>

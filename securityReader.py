@@ -17,7 +17,7 @@ import binascii
 import struct
 
 # 通过下面的方式进行简单配置输出方式与日志级别
-logging.basicConfig(filename='logger.log', level=logging.INFO)
+logging.basicConfig(filename='C:\logger.log', level=logging.INFO)
 
 
 # 初始化读卡器
@@ -183,7 +183,7 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
   data_bytes,s1,s2 = sendCommand(card_service,command_bytes)
 
   # 读取数据
-  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, 60)
+  data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, 56)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   print('report: '+bytes2hexstr(data_bytes))
@@ -268,7 +268,6 @@ def ISO14443_4A_ReadBinary(card_service,cla_bytes, address_start_int, length_int
     rf_command_bytes = [cla_bytes,0xB0]
     rf_command_bytes.extend(data_address_bytes)
     rf_command_bytes.extend(bytes([package_size_int]))
-
     data_bytes, s1,s2 = sendCommand(card_service,rf_command_bytes)
     if s1 == 144 and s2 == 0:
       data_read_bytes.extend(data_bytes)
@@ -533,7 +532,6 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
           tempture2 = Cal_Data[2][0]
           adc2 = Cal_Data[2][1]
         if (adc1 - adc2) == 0:
-            print('标签未标定')
             return info_json
         k = (tempture1-tempture2)/(adc1-adc2)
         b = tempture1 - (k*adc1)
@@ -566,22 +564,24 @@ def read_uid(card_service):
   res,s1,s2 = sendCommand(card_service,rf_command_bytes)
   return bytes2hexstr(res)
 
+# 写入自定义数据
 def write_data(card_service,Des3_Cipher,write_bytes):
-    print('进来了')
     COS_Write_Config(card_service, Des3_Cipher, 49216, len(write_bytes), write_bytes, 56)
-    data_bytes = COS_Read_Config(card_service, Des3_Cipher, 49216, len(write_bytes), 56)
-    data_bytes = data_bytes[:len(data_bytes)]
-    result = bytes.decode(data_bytes[:len(data_bytes) -16])
+    return '写入成功'
+# 读取自定义数据
+def read_data(card_service,Des3_Cipher):
+    data_bytes = COS_Read_Config(card_service, Des3_Cipher, 49216, 4021, 56)
+    last_index = data_bytes.index(0xff)
+    data_bytes = data_bytes[:last_index]
+    result = data_bytes.decode(encoding='utf-8', errors='ignore')
     return result
 
 
 
-
-
 # card_service = init()
-# result = read_uid(card_service)
 # Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
 
+# result = read_uid(card_service)
 
 # Des3_Cipher = COS_Access(card_service,'0x00 0x01 0x02 0x03 0x04 0x05 0x06 0x07','0x08 0x09 0x00 0x0B 0x0C 0x0D 0x0E 0x0F')
 # COS_Analysis(card_service,Des3_Cipher,56,False)
@@ -604,8 +604,16 @@ def write_data(card_service,Des3_Cipher,write_bytes):
 # print(str2byte)
 # print(data_bytes)
 # print(bytes.decode(data_bytes[:len(data_bytes) -16]))
+#
+# des3_key_list = [0xff for i in range(16)]
+# des3_key_bytes = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), des3_key_list))
+# print(type(des3_key_list))
 
-current_words = [0xff]
-current_words = current_words + [0xff] * (10 - len(current_words))
-print(current_words)
 
+
+# write_str = '123'
+# write_bytes = bytes(write_str, encoding = "utf8")
+# add = [0xff for i in range(8)]
+# add = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), add))
+# write_bytes = write_bytes+add
+# print(bytes2hexstr(write_bytes))

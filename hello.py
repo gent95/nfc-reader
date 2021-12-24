@@ -1,5 +1,6 @@
 import webview
 import securityReader as reader
+import random as rnd
 
 class Api:
     def __init__(self):
@@ -7,11 +8,10 @@ class Api:
 
     def read_wy(self,keya,keyb):
         card_service = reader.init()
+        uid = reader.read_uid(card_service)
         Des3_Cipher = reader.COS_Access(card_service,keya,keyb)
         info_json = reader.COS_Read_Tempture(card_service,Des3_Cipher)
         result = {
-            "keya":keya,
-            "keyb":keyb,
             "info" :info_json
         }
         return result
@@ -19,10 +19,8 @@ class Api:
     def read_yy(self,keya,keyb):
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service,keya,keyb)
-        info_json = reader.COS_Analysis(card_service,Des3_Cipher,60,False)
+        info_json = reader.COS_Analysis(card_service,Des3_Cipher,56,False)
         result = {
-            "keya":keya,
-            "keyb":keyb,
             "info" :info_json
         }
         return result
@@ -54,14 +52,25 @@ class Api:
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service, keya, keyb)
         write_bytes = bytes(write_str, encoding="utf8")
-
-        if len(write_bytes) >= 4031:
+        write_bytes_len = len(write_bytes)
+        if write_bytes_len >= 4031:
             return '写入数据太大啦'
+        add = [0xff for i in range(8-(write_bytes_len % 8))]
+        add = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), add))
+        write_bytes+=add
         result = reader.write_data(card_service,Des3_Cipher,write_bytes)
         return result
+
+    def read_data(self,keya,keyb):
+        card_service = reader.init()
+        Des3_Cipher = reader.COS_Access(card_service, keya, keyb)
+        result = reader.read_data(card_service,Des3_Cipher)
+        return result
+
+
 
 
 if __name__ == '__main__':
     api = Api()
-    window = webview.create_window('中义NFC读写器', url='helloworld.html', js_api=api,resizable=False,width=800,height=800)
+    window = webview.create_window('中义NFC读写器', url='helloworld.html', js_api=api,resizable=True,width=800,height=800)
     webview.start(debug = True)
