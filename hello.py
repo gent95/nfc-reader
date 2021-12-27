@@ -6,6 +6,7 @@ class Api:
     def __init__(self):
         self.cancel_heavy_stuff_flag = False
 
+    # 读取无源标签温度
     def read_wy(self,keya,keyb):
         card_service = reader.init()
         uid = reader.read_uid(card_service)
@@ -16,6 +17,7 @@ class Api:
         }
         return result
 
+    # 读取有源标签温度
     def read_yy(self,keya,keyb):
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service,keya,keyb)
@@ -25,6 +27,7 @@ class Api:
         }
         return result
 
+    # 激活有源标签
     def active_yy(self,keya,keyb):
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service,keya,keyb)
@@ -34,6 +37,7 @@ class Api:
         else:
             return '芯片激活失败'
 
+    # 检查有源标签状态
     def check_yy_status(self,keya,keyb):
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service,keya,keyb)
@@ -42,12 +46,13 @@ class Api:
             return'芯片已激活'
         else:
             return '芯片未激活'
-
+    # 读取标签uid
     def read_uid(self):
         card_service = reader.init()
         uid = reader.read_uid(card_service)
         return uid
 
+    # 写入自定义信息
     def write_data(self,keya,keyb,write_str):
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service, keya, keyb)
@@ -61,14 +66,12 @@ class Api:
         result = reader.write_data(card_service,Des3_Cipher,write_bytes)
         return result
 
+    # 读取自定义信息
     def read_data(self,keya,keyb):
         card_service = reader.init()
         Des3_Cipher = reader.COS_Access(card_service, keya, keyb)
         result = reader.read_data(card_service,Des3_Cipher)
         return result
-
-
-
 
 if __name__ == '__main__':
     api = Api()

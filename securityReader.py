@@ -30,28 +30,22 @@ def init():
   # atr = ATR(card_service.connection.getATR())
   return card_service
 
+# 格式化输出
 def result_print(result_out_str):
-  print(result_out_str)
   logging.info(result_out_str)
-
+# 格式化输出
 def trace_command(apdu):
-    print('sending ', toHexString(apdu))
     logging.info('sending: '+ toHexString(apdu))
-
+# 格式化输出
 def trace_response(response, sw1, sw2):
     if response is None:
         response = []
-    print(
-        'serial no.: ',
-        toHexString(response),
-        ' status words: ',
-        "%x %x" % (sw1, sw2)
-    )
     logging.info( 'serial no.: '+
         toHexString(response)+
         ' status words: '+
         "%x %x" % (sw1, sw2))
 
+# 字节数组转int
 def bytes2int(data_bytes):
   data_number = len(data_bytes)
   data_int = 0
@@ -59,9 +53,11 @@ def bytes2int(data_bytes):
     data_int = data_int + data_bytes[data_number-i-1]*math.pow(2, i*8)
   return int(data_int)   
 
+# int 转字节数组
 def int2bytes(data_int):
   return bytes([data_int])
 
+# 字节数组转int 集合
 def bytes2int_list(data_bytes):
   data_number = len(data_bytes)
   data_int_list = list(range(data_number))
@@ -69,11 +65,13 @@ def bytes2int_list(data_bytes):
     data_int_list[i] = int(str(data_bytes[i]))
   return data_int_list
 
+# hex字符串转字节数组
 def hexstr2bytes(hex_str):
   hex_int_list = hexstr2int_list(hex_str)
   hex_bytes = int_list2bytes(hex_int_list)
   return hex_bytes
 
+# 字节数组转hex字符串
 def bytes2hexstr(data_bytes):
   data_number = len(data_bytes)
   data_hex_str = ''
@@ -82,7 +80,7 @@ def bytes2hexstr(data_bytes):
     data_hex_str += "{:02X} ".format(data_int)
   return data_hex_str
 
-
+# hex字符串转int 集合
 def hexstr2int_list(data_str):
   data_str = data_str.replace('0x', '')
   data_str = data_str.replace(' ', '')
@@ -96,7 +94,8 @@ def hexstr2int_list(data_str):
     data_bytes_list[i] = bytes.fromhex(data_str[i*2:i*2+2])
     data_int_list[i] = int.from_bytes(data_bytes_list[i], 'big')
   return data_int_list
-  
+
+# int集合转字节数组
 def int_list2bytes(data_int_list):
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_int_list))
   return data_bytes
