@@ -163,8 +163,8 @@ def sscom_transceive_bytes(sscom, write_data_bytes):
         data_bytes = sscom.read(data_length_int)
     else:
         data_bytes = b''
-    print('>>' + bytes2hexstr(write_data_bytes))
-    print('<<' + bytes2hexstr(data_bytes))
+    # print('>>' + bytes2hexstr(write_data_bytes))
+    # print('<<' + bytes2hexstr(data_bytes))
     return data_bytes, data_length_int
 
 

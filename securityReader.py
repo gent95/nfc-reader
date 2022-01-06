@@ -3,6 +3,8 @@
 """
 Smart Card Reader / Writer
 """
+import time
+
 from smartcard.CardType import AnyCardType
 from smartcard.CardRequest import CardRequest
 from smartcard.util import toHexString
@@ -17,7 +19,7 @@ import binascii
 import struct
 
 # 通过下面的方式进行简单配置输出方式与日志级别
-logging.basicConfig(filename='C:\logger.log', level=logging.INFO)
+logging.basicConfig(filename='\logger.log', level=logging.INFO)
 
 
 # 初始化读卡器
@@ -137,9 +139,9 @@ def COS_Access(card_service,KEYA_str, KEYB_str):
     # 加密随机数
     random_key_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), random_int_list))
     trnd_encrpyt_bytes = Des3_Cipher.encrypt(random_key_bytes)
-    # trnd_bytes= rnd.randbytes(8)
+    trnd_bytes= rnd.randbytes(8)
 
-    trnd_bytes = [0xA2,0xD6,0x00,0x10,0x10,0x00,0x10,0x10]
+    # trnd_bytes = [0xA2,0xD6,0x00,0x10,0x10,0x00,0x10,0x10]
 
     command_bytes = [0xA2,0xD6,0x00,0x10,0x10]
     command_bytes.extend(trnd_encrpyt_bytes)
@@ -151,8 +153,6 @@ def COS_Access(card_service,KEYA_str, KEYB_str):
       trnd_encrpyt_bytes = Des3_Cipher.encrypt(trnd_bytes)
       if bytes2hexstr(trnd_encrpyt_bytes) == bytes2hexstr(res[0:8]):
           print('验证成功')
-
-
     return Des3_Cipher
 
 # 读读取数据
@@ -567,9 +567,11 @@ def read_uid(card_service):
 def write_data(card_service,Des3_Cipher,write_bytes):
     COS_Write_Config(card_service, Des3_Cipher, 49216, len(write_bytes), write_bytes, 56)
     return '写入成功'
+
 # 读取自定义数据
 def read_data(card_service,Des3_Cipher):
     data_bytes = COS_Read_Config(card_service, Des3_Cipher, 49216, 4021, 56)
+    print('data '+bytes2hexstr(data_bytes))
     last_index = data_bytes.index(0xff)
     data_bytes = data_bytes[:last_index]
     result = data_bytes.decode(encoding='utf-8', errors='ignore')
@@ -577,8 +579,8 @@ def read_data(card_service,Des3_Cipher):
 
 
 
-# card_service = init()
-# Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
+card_service = init()
+Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
 
 # result = read_uid(card_service)
 
@@ -596,23 +598,40 @@ def read_data(card_service,Des3_Cipher):
 # str2byte = bytes(write_str, encoding = "utf8")
 # print(bytes2hexstr(str2byte))
 
+# print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+# for i in range(3):
+#     COS_Write_Config(card_service,Des3_Cipher,49216,len(str2byte),str2byte,56)
+# print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
-# COS_Write_Config(card_service,Des3_Cipher,49216,len(str2byte),str2byte,56)
 #
-# data_bytes = COS_Read_Config(card_service,Des3_Cipher,49216,len(str2byte),56)
-# print(str2byte)
-# print(data_bytes)
-# print(bytes.decode(data_bytes[:len(data_bytes) -16]))
+# print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+print(time.localtime())
+# for i in range(3):
+data_bytes = COS_Read_Config(card_service,Des3_Cipher,49216,4021,56)
+#     print(str2byte)
+#     print(data_bytes)
+#     # print(bytes.decode(data_bytes[:len(data_bytes) -16]))
+# print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
+print(time.localtime())
+
+# KEYA_str =  '0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7'
+# KEYB_str = '0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF'
+# trnd_bytes = [0x46,0xAB,0x65,0xB0,0xB6,0xA5,0x1E,0xE3]
+# mid_bytes = [0xF3,0x59,0x3C,0x90,0x48,0xAB,0x15,0x4A]
 #
-# des3_key_list = [0xff for i in range(16)]
+# # 计算KEYA* KEYB*
+# random_int_list = bytes2int_list(trnd_bytes)
+# mid_int_list = bytes2int_list(mid_bytes)
+# keya_int_list = hexstr2int_list(KEYA_str)
+# keyb_int_list = hexstr2int_list(KEYB_str)
+# des3_key_list = [0 for i in range(16)]
+# for i in range(0, 8):
+#     des3_key_list[i] = random_int_list[i] ^ keya_int_list[i]
+#     des3_key_list[i + 8] = mid_int_list[i] ^ keyb_int_list[i]
 # des3_key_bytes = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), des3_key_list))
-# print(type(des3_key_list))
-
-
-
-# write_str = '123'
-# write_bytes = bytes(write_str, encoding = "utf8")
-# add = [0xff for i in range(8)]
-# add = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), add))
-# write_bytes = write_bytes+add
-# print(bytes2hexstr(write_bytes))
+# print(bytes2hexstr(des3_key_bytes))
+# Des3_Cipher = des3.new(des3_key_bytes, des3.MODE_ECB)
+# # 加密随机数
+# random_key_bytes = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), random_int_list))
+# trnd_encrpyt_bytes = Des3_Cipher.encrypt(random_key_bytes)
+# print(bytes2hexstr(trnd_encrpyt_bytes))

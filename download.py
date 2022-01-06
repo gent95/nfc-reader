@@ -1,4 +1,7 @@
 import os
+import time
+import uuid
+
 import requests
 import mysql.connector
 from elasticsearch import Elasticsearch
@@ -124,18 +127,52 @@ def exportES2excel():
 # 	data = cur.execute(sql,param) # 执行SQL语句
 	
 # conn.commit()
-body = {
-		"size": 10,
-		"from": 0,
-		"sort": [
-		    {
-		        "createTime.keyword":{
-		            "order":"asc"
-		        }
-		    }
-		    ]
-	}
 
-es = elasticsearch_connection_init()
-data = es.search(index="fxc-temp", body=body)
-print(data)
+
+# body = {
+# 		"size": 10,
+# 		"from": 0,
+# 		"sort": [
+# 		    {
+# 		        "createTime.keyword":{
+# 		            "order":"asc"
+# 		        }
+# 		    }
+# 		    ]
+# 	}
+#
+# es = elasticsearch_connection_init()
+# data = es.search(index="fxc-temp", body=body)
+# print(data)
+
+ids = ['19986dcc-4401-4369-9618-5dce06827356',
+'43097dff-86d2-47fc-b7ad-7fa0bec332f5',
+'7b15b0e0-9cef-4eaf-9dd2-a7cc297b774e',
+'a20624c8-5e19-41b5-ade5-ec832c52a37d',
+'a34429d7-9bc5-4ca3-94b4-3318bed9770a',
+'a858bd56-87f5-481f-9043-fa7b91b391b5',
+'b54f2d3b-23d2-4ac2-8747-33d1fb0b42de',
+'e940936d-df78-4dab-b78c-700e385e242f']
+
+conn,cur = mysqlConnectionInit('125.124.123.66',3309,'root','A123456','zy-kgzs')
+sql = " select * from vvm_chain where pid = %s "
+for id in ids[:]:
+	cur.execute(sql,(id,))  # 执行SQL语句
+	data = cur.fetchall()  # 通过fetchall方法获得数据
+	for row in data[:]:
+		for i in range(20):
+			row_tuple = list(row)
+			row_tuple[2] = row[0]
+			row_tuple[10] = row_tuple[10] + ',' + row[0]
+			row_tuple[0] = str(uuid.uuid4())
+			row_tuple[3] = row_tuple[3] + '-'+ str(i)
+			row_tuple[9] = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+			row_tuple[16] = 0
+			row_tuple [17] = 0
+			row_tuple[18] = 0
+			row_tuple[20] = ''
+			row_tuple[6] =  time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+			row_tuple = tuple(row_tuple)
+			sql1 = 'INSERT INTO vvm_chain (`id`, `code`, `pid`, `name`, `company_id`, `user_id`, `create_time`, `lat`, `lng`, `update_time`, `ancestors`, `product_id`, `rule_group_id`, `package_type`, `transport_type`, `status`, `last_temperature`, `max_temperature`, `min_temperature`, `num`, `remark`, `transport_status`, `node_status`) VALUES '+str(row_tuple)
+			# cur.execute(sql1)
+			print(sql1)
