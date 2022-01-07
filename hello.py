@@ -46,6 +46,7 @@ class Api:
             return'芯片已激活'
         else:
             return '芯片未激活'
+
     # 读取标签uid
     def read_uid(self):
         card_service = reader.init()

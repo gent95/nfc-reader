@@ -185,7 +185,8 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
   data_bytes = ISO14443_4A_ReadBinary(card_service,0xA2, 0, 80, 56)
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
-  print('report: '+bytes2hexstr(data_bytes))
+  # print('report: '+bytes2hexstr(data_bytes))
+  # data_bytes = hexstr2bytes('00 4F C1 01 00 00 00 48 54 02 65 6E 72 18 01 11 00 01 00 08 00 00 00 00 00 00 11 11 11 11 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 41 00 00 00 02 10 01 2C AC 02 00 73 12 DB 00 00 3E8640')
   # 解析数据
   data_bias = 12
   CID_bytes  = data_bytes[data_bias+0: data_bias+2]
@@ -198,12 +199,12 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
   PAGE_bytes = data_bytes[data_bias+50:data_bias+51]
   RNUM_bytes = data_bytes[data_bias+51:data_bias+55]
   Cal_Data = [[0 for i in range(2)] for j in range(3)]
-  Cal_Data[0][0] = (data_bytes[data_bias+55]*16 + (data_bytes[data_bias+56]>>4))/10
-  Cal_Data[0][1] = (data_bytes[data_bias+56]&0x0F)*256 + data_bytes[data_bias+57]
-  Cal_Data[1][0] = (data_bytes[data_bias+58]*16 + (data_bytes[data_bias+59]>>4))/10
-  Cal_Data[1][1] = (data_bytes[data_bias+59]&0x0F)*256 + data_bytes[data_bias+60]
-  Cal_Data[2][0] = (data_bytes[data_bias+61]*16 + (data_bytes[data_bias+62]>>4))/10
-  Cal_Data[2][1] = (data_bytes[data_bias+62]&0x0F)*256 + data_bytes[data_bias+63]
+  Cal_Data[0][0] = ((data_bytes[data_bias+56]>>4)+data_bytes[data_bias+55])/10
+  Cal_Data[0][1] = data_bytes[data_bias+57] +(data_bytes[data_bias+56]&0x0F)*256
+  Cal_Data[1][0] =((data_bytes[data_bias+59]>>4)+data_bytes[data_bias+58])/10
+  Cal_Data[1][1] = data_bytes[data_bias+60] + (data_bytes[data_bias+59]&0x0F)*256
+  Cal_Data[2][0] = int(''.join(reversed(hex(data_bytes[data_bias+61])[2:])) + str((data_bytes[data_bias+62]>>4)))/10
+  Cal_Data[2][1] = data_bytes[data_bias+63] + (data_bytes[data_bias+62]&0x0F)*256
   info_json = {
       "CID":bytes2hexstr(CID_bytes),
       "TID":bytes2hexstr(TID_bytes),
@@ -230,6 +231,7 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
 
   command_bytes = [0xA2,0xB0,0x00,0x4E,0x08]
   data_bytes,s1,s2 = sendCommand(card_service,command_bytes)
+  # print(bytes2hexstr(data_bytes))
   data_bytes = b''.join(map(lambda d:int.to_bytes(d, 1, 'little'), data_bytes))
   data_bytes = Des3_Cipher.decrypt(data_bytes)
   tempture_int = int(str(data_bytes[0]))*256 + int(str(data_bytes[1]))
@@ -247,7 +249,7 @@ def COS_Read_Tempture(card_service,Des3_Cipher):
   k = (tempture1-tempture2)/(adc1-adc2)
   b = tempture1 - (k*adc1)
   tempture_float = k*adc_data_int + b
-  info_json['tempture_data'] = round(tempture_float,2)
+  info_json['tempture_data'] = round(tempture_float,1)
   return info_json
 
 # 读数据
@@ -435,12 +437,12 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
       }
   else:
     Cal_Data = [[0 for i in range(2)] for j in range(3)]
-    Cal_Data[0][0] = (data_bytes[data_bias+55]*16 + (data_bytes[data_bias+56]>>4))/10
-    Cal_Data[0][1] = (data_bytes[data_bias+56]&0x0F)*256 + data_bytes[data_bias+57]
-    Cal_Data[1][0] = (data_bytes[data_bias+58]*16 + (data_bytes[data_bias+59]>>4))/10
-    Cal_Data[1][1] = (data_bytes[data_bias+59]&0x0F)*256 + data_bytes[data_bias+60]
-    Cal_Data[2][0] = (data_bytes[data_bias+61]*16 + (data_bytes[data_bias+62]>>4))/10
-    Cal_Data[2][1] = (data_bytes[data_bias+62]&0x0F)*256 + data_bytes[data_bias+63]
+    Cal_Data[0][0] = ((data_bytes[data_bias + 56] >> 4) + data_bytes[data_bias + 55]) / 10
+    Cal_Data[0][1] = data_bytes[data_bias + 57] + (data_bytes[data_bias + 56] & 0x0F) * 256
+    Cal_Data[1][0] = ((data_bytes[data_bias + 59] >> 4) + data_bytes[data_bias + 58]) / 10
+    Cal_Data[1][1] = data_bytes[data_bias + 60] + (data_bytes[data_bias + 59] & 0x0F) * 256
+    Cal_Data[2][0] = int(''.join(reversed(hex(data_bytes[data_bias + 61])[2:])) + str((data_bytes[data_bias + 62] >> 4))) / 10
+    Cal_Data[2][1] = data_bytes[data_bias + 63] + (data_bytes[data_bias + 62] & 0x0F) * 256
     info_json = {
         "CID":bytes2hexstr(CID_bytes),
         "TID":bytes2hexstr(TID_bytes),
@@ -535,10 +537,10 @@ def COS_Analysis(card_service,Des3_Cipher, DATA_SIZE, show_picture_tag):
         k = (tempture1-tempture2)/(adc1-adc2)
         b = tempture1 - (k*adc1)
         tempture_float = k*adc_data_int + b
-        tempture_data[decode_count-1] = tempture_float
+        tempture_data[decode_count-1] = round(tempture_float,1)
       else:
         tempture_data[decode_count-1] = adc_data_int
-  result_print(str(tempture_data))
+
   info_json['tempture_data'] = tempture_data
   # 波形显示
   if show_picture_tag:
@@ -579,8 +581,8 @@ def read_data(card_service,Des3_Cipher):
 
 
 
-card_service = init()
-Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
+# card_service = init()
+# Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7','0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF')
 
 # result = read_uid(card_service)
 
@@ -591,8 +593,8 @@ Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7',
 
 
 # data_bytes = COS_Read_Config(card_service,Des3_Cipher,49162,8,8)
-# COS_Read_Tempture(card_service,Des3_Cipher)
-# a = rnd.randbytes(8)
+# result = COS_Read_Tempture(card_service,Des3_Cipher)
+# print(result)
 #
 # write_str = '毛毛;;15751396666;;子涵;;202112170001;;浙江省杭州市萧山啊啊区鸿兴路111号;;data:image/jpeg;base64,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'
 # str2byte = bytes(write_str, encoding = "utf8")
@@ -605,14 +607,14 @@ Des3_Cipher = COS_Access(card_service,'0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7',
 
 #
 # print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-print(time.localtime())
+# print(time.localtime())
 # for i in range(3):
-data_bytes = COS_Read_Config(card_service,Des3_Cipher,49216,4021,56)
+# data_bytes = COS_Read_Config(card_service,Des3_Cipher,49216,4021,56)
 #     print(str2byte)
 #     print(data_bytes)
 #     # print(bytes.decode(data_bytes[:len(data_bytes) -16]))
 # print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
-print(time.localtime())
+# print(time.localtime())
 
 # KEYA_str =  '0xA0 0xA1 0xA2 0xA3 0xA4 0xA5 0xA6 0xA7'
 # KEYB_str = '0xA8 0xA9 0xAA 0xAB 0xAC 0xAD 0xAE 0xAF'
@@ -635,3 +637,8 @@ print(time.localtime())
 # random_key_bytes = b''.join(map(lambda d: int.to_bytes(d, 1, 'little'), random_int_list))
 # trnd_encrpyt_bytes = Des3_Cipher.encrypt(random_key_bytes)
 # print(bytes2hexstr(trnd_encrpyt_bytes))
+
+
+# str=[0x73]
+# str = bytes2hexstr(str)
+# print(''.join(reversed(str)))
